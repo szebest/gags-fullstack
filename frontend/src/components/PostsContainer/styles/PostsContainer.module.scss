@@ -1,0 +1,13 @@
+.postsContainerWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 750px;
+}
+
+.observer {
+    position: absolute;
+    bottom: 750px;
+}

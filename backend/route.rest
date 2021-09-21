@@ -1,0 +1,68 @@
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+    "username": "szebest",
+    "password": "aaaaaa"
+}
+
+###
+
+POST http://localhost:3001/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN6ZWJlc3QiLCJpYXQiOjE2MzIxMjgxMjl9.siiICXcHi_DG1cYsqGam3NPSuw3hdg4rvT-gpwEWMDc"
+}
+
+###
+
+POST http://localhost:3001/register
+Content-Type: application/json
+
+{
+    "username": "Czare",
+    "password": "twoja star"
+}
+
+###
+
+POST http://localhost:3001/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN6YXJlayIsImlhdCI6MTYzMTc5NDIwNH0.HrwD9XDxhxV-6xrZwcUPeYQYoeSeVX7JXVLhVei87Z8"
+}
+
+###
+
+GET http://localhost:3001
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN6YXJlayIsImlhdCI6MTYzMTc4NzMxNCwiZXhwIjoxNjMxNzg5MTE0fQ.ujXyLtTazVyjP4ej94ybfg_7iv5iEurelmhqHcrQxtw
+
+
+###
+
+POST http://localhost:3001/hasAccess
+Content-Type: application/json
+
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWEiLCJpYXQiOjE2MzE4MjM3MTIsImV4cCI6MTYzMTgyMzcyN30.L_NidZxCzX1Qm-BR01-TYN1-qA3TMbqQFCDSpV622RQ"
+}
+
+###
+
+POST http://localhost:3001/upload
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN6ZWJlc3QiLCJpYXQiOjE2MzE5MTEyMjgsImV4cCI6MTYzMTkxMzAyOH0.C3n6eragsjVH83KYNO-p2pI7bKSGNrKWkPrXt0Tiv0A
+
+###
+
+GET http://localhost:3001/posts?postNumber=1&postsPerRequest=1&section=Wholesome
+Content-Type: application/json
+
+###
+
+PATCH http://localhost:3001/posts/614721583f888e75f4a0cbc5?dislike=1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN6ZWJlc3QiLCJpYXQiOjE2MzIxMzM1NjgsImV4cCI6MTYzMjEzNDE2OH0.0tKaOJDLDXXnp2OGxkCiX0whskhbI5K6X_okB2ysGHo

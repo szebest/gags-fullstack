@@ -1,0 +1,65 @@
+.postWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    align-items: center;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+
+.statistics {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: 10%;
+    width: 100%;
+    gap: 25px;
+
+    div {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        min-width: 15%;
+        border: 1px solid rgba(180 180 180 / 0.65);
+        border-radius: 10px;
+        
+        p {
+            margin: 10% 0px;
+        }
+    }
+
+    div:hover {
+        background-color: rgba(150 150 150 / 0.25);
+    }
+}
+
+.imageContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    background-color: rgb(238, 238, 238);
+}
+
+.image {
+    max-width: 90%;
+}
+
+.clicked {
+    background-color: rgba(0 119 255 / .06) !important;
+    border-color: rgba(0 119 255 / .1);
+    
+    p {
+        color: #07f;
+    }
+
+    &:hover {
+        background-color: rgba(0 119 255 / .25) !important;
+    }
+}

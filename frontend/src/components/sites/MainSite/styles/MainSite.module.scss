@@ -1,0 +1,10 @@
+.mainSiteWrapper {
+    display: grid;
+    grid-template-columns: 25% 75%;
+    max-width: 90%;
+}
+
+.siteCenter {
+    display: flex;
+    justify-content: center;
+}

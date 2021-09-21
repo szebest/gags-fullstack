@@ -1,0 +1,125 @@
+.siteCenter {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+}
+
+.profileSiteWrapper {
+    display: flex;
+    max-width: 90%;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0px;
+    margin-top: 25px;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.about {
+    display: flex;
+    justify-content: center;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 12px 25px;
+
+    img {
+        min-height: 80px;
+        min-width: 80px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.5);
+    }
+}
+
+.options {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    min-width: 50%;
+
+    ul {
+        width: 75%;
+        padding: 0px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        list-style: none;
+        gap: 25px;
+
+        li {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            min-width: 150px;
+            min-height: 50px;
+            border: 1px solid rgba(180 180 180 / 0.65);
+            border-radius: 10px;
+
+            &:hover {
+                background-color: rgba(150 150 150 / 0.25);
+            }
+        }
+    }
+}
+
+.selected {
+    background-color: rgba(0 119 255 / .06) !important;
+    border-color: rgba(0 119 255 / .1);
+    color: #07f;
+
+    &:hover {
+        background-color: rgba(0 119 255 / .25) !important;
+    }
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.suchEmpty {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-self: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #ddd;
+
+    p {
+        margin: 0;
+        text-align: center;
+        line-height: calc(100px - 0.5rem);
+        max-height: 50px;
+        font-size: 2rem;
+    }
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 300px;
+    margin-bottom: 50px;
+}
+
+.observer {
+    position: absolute;
+    bottom: 300px;
+}

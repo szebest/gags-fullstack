@@ -1,0 +1,35 @@
+.sectionsWrapper {
+    display: flex;
+    position: fixed;
+    left: 5%;
+
+    &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    ul {
+        margin-right: 25px;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            margin: 25px 10px;
+
+            a {
+                text-decoration: none;
+                color: inherit;
+
+                h4 {
+                    margin: 0px;
+                }
+            }
+        }
+    }
+}
