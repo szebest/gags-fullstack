@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Redirect } from "react-router-dom"
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import Post from '../../Post/Post'
 import PostsContainer from '../../PostsContainer/PostsContainer'
 
 function ProfileSite({ hasAccess }) {
@@ -27,7 +26,8 @@ function ProfileSite({ hasAccess }) {
         if (!postsAvailable) return
 
         const promises = []
-        const requestArray = user.postsLiked.slice(postNumber, postsPerRequest)
+        const requestArray = user.postsLiked.slice(postNumber, postNumber + postsPerRequest)
+        console.log(requestArray)
         requestArray.forEach((post) => {
             const promise = new Promise((resolve, reject) => {
                 axios.get(`http://localhost:3001/posts/${post.postId}`)
@@ -48,9 +48,9 @@ function ProfileSite({ hasAccess }) {
             setContent(prev => [...prev, ...values])
         })
 
+        if (postNumber >= user.postsLiked.length) setPostsAvailable(false)
+        
         setPostNumber(prev => prev + postsPerRequest)
-
-        if (postNumber + postsPerRequest >= user.postsLiked.length) setPostsAvailable(false)
     }
 
     useEffect(() => {
@@ -78,11 +78,6 @@ function ProfileSite({ hasAccess }) {
 
         setDaysActive(differenceInDays)
     }, [user])
-
-    useEffect(() => {
-        if (postsAvailable && selected === 1)
-            getPostsLiked()
-    }, [postsAvailable, selected, user])
 
     if (hasAccess !== undefined && !hasAccess)
         return <Redirect to="/" />
@@ -124,7 +119,6 @@ function ProfileSite({ hasAccess }) {
                         </div>
                     }
                     {content && selected === 1 &&
-                        /*TODO: Does not callForMore items */
                         <PostsContainer posts={content} callForMore={getPostsLiked} />
                     }
                 </div>
