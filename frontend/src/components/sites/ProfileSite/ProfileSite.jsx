@@ -4,8 +4,7 @@ import { Redirect } from "react-router-dom"
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import Post from '../../Post/Post'
-import 'intersection-observer'
-import { useIsVisible } from 'react-is-visible'
+import PostsContainer from '../../PostsContainer/PostsContainer'
 
 function ProfileSite({ hasAccess }) {
     const [user, setUser] = useState({})
@@ -13,11 +12,9 @@ function ProfileSite({ hasAccess }) {
     const [content, setContent] = useState([])
     const [daysActive, setDaysActive] = useState()
 
-    const postsPerRequest = 2
+    const postsPerRequest = 5
     const [postNumber, setPostNumber] = useState(0)
     const [postsAvailable, setPostsAvailable] = useState(true)
-    const observeRef = useRef()
-    const isVisible = useIsVisible(observeRef)
 
     const treatAsUTC = (date) => {
         const result = new Date(date)
@@ -27,6 +24,8 @@ function ProfileSite({ hasAccess }) {
     }
 
     const getPostsLiked = () => {
+        if (!postsAvailable) return
+
         const promises = []
         const requestArray = user.postsLiked.slice(postNumber, postsPerRequest)
         requestArray.forEach((post) => {
@@ -34,7 +33,7 @@ function ProfileSite({ hasAccess }) {
                 axios.get(`http://localhost:3001/posts/${post.postId}`)
                 .then(res => {
                     const postReceived = res.data.post
-                    postReceived.liked = post.actionType 
+                    postReceived.actionType = post.actionType 
                     resolve(postReceived)
                 })
                 .catch(err => {
@@ -50,8 +49,6 @@ function ProfileSite({ hasAccess }) {
         })
 
         setPostNumber(prev => prev + postsPerRequest)
-
-        console.log(postNumber + postsPerRequest >= user.postsLiked.length)
 
         if (postNumber + postsPerRequest >= user.postsLiked.length) setPostsAvailable(false)
     }
@@ -83,10 +80,9 @@ function ProfileSite({ hasAccess }) {
     }, [user])
 
     useEffect(() => {
-        if (isVisible && postsAvailable && selected === 1) {
+        if (postsAvailable && selected === 1)
             getPostsLiked()
-        }
-    }, [isVisible, postsAvailable, selected, user])
+    }, [postsAvailable, selected, user])
 
     if (hasAccess !== undefined && !hasAccess)
         return <Redirect to="/" />
@@ -127,25 +123,11 @@ function ProfileSite({ hasAccess }) {
                             <p>Wow, such empty</p>
                         </div>
                     }
-                    {content && content.length > 0 &&
-                        content.map((post) => 
-                            <Post
-                                _id={post._id}
-                                key={post._id}
-                                title={post.title}
-                                author={post.author}
-                                section={post.section}
-                                imgSrc={post.imgSrc}
-                                likes={post.likes}
-                                dislikes={post.dislikes}
-                                alreadyLiked={post.liked}
-                            />
-                        )
+                    {content && selected === 1 &&
+                        /*TODO: Does not callForMore items */
+                        <PostsContainer posts={content} callForMore={getPostsLiked} />
                     }
                 </div>
-            </div>
-            <div className={classes.observer} ref={observeRef} >
-
             </div>
         </div>
     );

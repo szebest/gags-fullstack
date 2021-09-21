@@ -214,11 +214,28 @@ app.get('/posts', async (req, res) => {
     const firstPost = parseInt(req.query.postNumber)
     const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
     const section = req.query.section
+    const accessToken = req.query.accessToken
+    let username = ""
+
+    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+        if (!err)
+            username = user.username
+    })
 
     try {
-        const posts = section === 'undefined' ? await Posts.find() : await Posts.find({ section })
+        const posts = section === 'undefined' ? await Posts.find().lean() : await Posts.find({ section }).lean()
+        const userLikedPosts = username.length > 0 ? (await User.find({ username }))[0].postsLiked : []
+
         posts.reverse()
         const slicedPosts = posts.slice(firstPost, firstPost + amountOfReturnedPosts)
+
+        userLikedPosts.forEach((likedPost) => {
+            slicedPosts.forEach((post, index) => {
+                if (likedPost.postId.toString() === post._id.toString())
+                    slicedPosts[index].actionType = likedPost.actionType
+            })
+        })
+
         const numberOfPostsLeft = Math.max(posts.length - firstPost - amountOfReturnedPosts, 0)
         return res.status(200).json({ 
             posts: slicedPosts, 
@@ -226,6 +243,7 @@ app.get('/posts', async (req, res) => {
         })
     }
     catch(err) {
+        console.log(err)
         return res.status(400)
     }
 })

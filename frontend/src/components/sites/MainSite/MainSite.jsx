@@ -1,6 +1,6 @@
 import classes from './styles/MainSite.module.scss'
 import Sections from '../../Sections/Sections'
-import PostsContainer from '../../PostsContainer/PostsContainer'
+import PostsContainer from '../../PostsContainer/PostsContainerAPI'
 
 function MainSite() {
     return (

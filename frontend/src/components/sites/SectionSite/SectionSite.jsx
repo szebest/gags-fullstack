@@ -1,7 +1,7 @@
 import classes from './styles/SectionSite.module.scss'
 import { useParams } from 'react-router-dom'
 import Sections from '../../Sections/Sections'
-import PostsContainer from '../../PostsContainer/PostsContainer'
+import PostsContainer from '../../PostsContainer/PostsContainerAPI'
 
 function SectionSite() {
     const { sectionName } = useParams()
