@@ -12,10 +12,12 @@ import { useState, useEffect } from 'react'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import ProfileSite from './components/sites/ProfileSite/ProfileSite'
+import { useDispatch } from 'react-redux'
+import { setHasAccess } from './actions'
 
 function App() {
     const [accessToken, setAccessToken] = useState()
-    const [hasAccess, setHasAccess] = useState()
+    const dispatch = useDispatch()
 
     useEffect(() => {
         const id = setInterval(() => {
@@ -68,7 +70,7 @@ function App() {
                 accessToken: Cookies.get('accessToken')
             })
             .then(res => {
-                setHasAccess(res.data.access)
+                dispatch(setHasAccess(res.data.access))
             })
             .catch(err => {
                 //Error, force logout
@@ -81,7 +83,7 @@ function App() {
 
     return (
         <Router>
-            <Header hasAccess={hasAccess} />
+            <Header />
             <Switch>
                 <Route exact path="/">
                     <MainSite />
@@ -90,16 +92,16 @@ function App() {
                     <MainSite />
                 </Route>
                 <Route exact path="/login">
-                    <LoginSite hasAccess={hasAccess} />
+                    <LoginSite />
                 </Route>
                 <Route exact path="/register">
-                    <RegisterSite hasAccess={hasAccess} />
+                    <RegisterSite />
                 </Route>
                 <Route exact path="/upload">
-                    <UploadSite hasAccess={hasAccess} />
+                    <UploadSite />
                 </Route>
                 <Route exact path="/profile">
-                    <ProfileSite hasAccess={hasAccess} />
+                    <ProfileSite />
                 </Route>
             </Switch>
         </Router>

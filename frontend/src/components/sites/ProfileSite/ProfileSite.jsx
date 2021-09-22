@@ -4,8 +4,9 @@ import { Redirect } from "react-router-dom"
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import PostsContainer from '../../PostsContainer/PostsContainer'
+import { useSelector } from 'react-redux'
 
-function ProfileSite({ hasAccess }) {
+function ProfileSite() {
     const [user, setUser] = useState({})
     const [selected, setSelected] = useState(0)
     const [content, setContent] = useState([])
@@ -14,6 +15,8 @@ function ProfileSite({ hasAccess }) {
     const postsPerRequest = 5
     const [postNumber, setPostNumber] = useState(0)
     const [postsAvailable, setPostsAvailable] = useState(true)
+
+    const hasAccess = useSelector(state => state.hasAccess)
 
     const treatAsUTC = (date) => {
         const result = new Date(date)

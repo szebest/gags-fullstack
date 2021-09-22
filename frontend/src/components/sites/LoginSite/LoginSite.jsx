@@ -3,13 +3,15 @@ import { useRef, useState } from 'react'
 import axios from 'axios'
 import { Redirect } from 'react-router-dom'
 import Cookies from 'js-cookie'
+import { useSelector } from 'react-redux'
 
-function LoginSite({ hasAccess }) {
+function LoginSite() {
     const queryParam = new URLSearchParams(document.location.search).get("username")
     const [usernameState, setUsernameState] = useState(queryParam ? queryParam : "")
     const passwordRef = useRef()
     const [error, setError] = useState("")
     const [, setLoading] = useState(false)
+    const hasAccess = useSelector(state => state.hasAccess)
 
     if (hasAccess !== undefined && hasAccess)
         return <Redirect to="/" />

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom"
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
-function Login({ hasAccess }) {
+function Login() {
     const [user, setUser] = useState({})
+    const hasAccess = useSelector(state => state.hasAccess)
 
     useEffect(() => {
         if (hasAccess) {

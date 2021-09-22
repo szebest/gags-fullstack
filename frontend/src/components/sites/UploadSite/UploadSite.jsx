@@ -3,8 +3,9 @@ import { Redirect } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
-function UploadSite({ hasAccess }) {
+function UploadSite() {
     const imageRef = useRef()
     const sectionRef = useRef()
     const [title, setTitle] = useState("")
@@ -12,6 +13,7 @@ function UploadSite({ hasAccess }) {
     const [redirect, setRedirect] = useState(false)
     const [submitClicked, setSubmitClicked] = useState(false)
     const [sections, setSections] = useState([])
+    const hasAccess = useSelector(state => state.hasAccess)
 
     useEffect(() => {
         axios.get('http://localhost:3001/sections')

@@ -2,7 +2,7 @@ import classes from './styles/Header.module.scss'
 import Login from '../Login/Login'
 import { Link } from "react-router-dom"
 
-function Header({ hasAccess }) {
+function Header() {
     return (
         <header className={classes.headerWrapper}>
             <div>
@@ -15,7 +15,7 @@ function Header({ hasAccess }) {
                             <Link to="/about">ABOUT</Link>
                         </li>
                     </ul>
-                    <Login hasAccess={hasAccess} />
+                    <Login />
                 </div>
             </div>
         </header>

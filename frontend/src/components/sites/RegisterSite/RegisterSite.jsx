@@ -2,8 +2,9 @@ import classes from './styles/RegisterSite.module.scss'
 import { useRef, useState } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
+import { useSelector } from 'react-redux'
 
-function RegisterSite({ hasAccess }) {
+function RegisterSite() {
     const usernameRef = useRef()
     const passwordRef = useRef()
     const confirmPasswordRef = useRef()
@@ -11,6 +12,7 @@ function RegisterSite({ hasAccess }) {
     const [error, setError] = useState([])
     const [redirect, setRedirect] = useState(false)
     const [fileSrc, setFileSrc] = useState("")
+    const hasAccess = useSelector(state => state.hasAccess)
 
     if (hasAccess !== undefined && hasAccess)
         return <Redirect to="/" />
