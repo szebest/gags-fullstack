@@ -1,6 +1,5 @@
 import Header from './components/Header/Header'
 import MainSite from './components/sites/MainSite/MainSite.jsx'
-import SectionSite from './components/sites/SectionSite/SectionSite.jsx'
 import LoginSite from './components/sites/LoginSite/LoginSite.jsx'
 import RegisterSite from './components/sites/RegisterSite/RegisterSite'
 import UploadSite from './components/sites/UploadSite/UploadSite'
@@ -87,8 +86,8 @@ function App() {
                 <Route exact path="/">
                     <MainSite />
                 </Route>
-                <Route path="/section/:sectionName">
-                    <SectionSite />
+                <Route exact path="/section/:sectionName">
+                    <MainSite />
                 </Route>
                 <Route exact path="/login">
                     <LoginSite hasAccess={hasAccess} />

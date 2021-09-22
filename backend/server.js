@@ -248,20 +248,6 @@ app.get('/posts', async (req, res) => {
     }
 })
 
-app.get('/posts/likedByUser', authenticateToken, async (req, res) => {
-    const username = req.username
-
-    try {
-        const foundUser = await User.find({ username })
-        const likedPosts = foundUser[0].postsLiked
-
-        return res.status(200).json({ likedPosts })
-    }
-    catch(err) {
-        return res.sendStatus(400)
-    }
-})
-
 app.get('/posts/:id', async (req, res) => {
     const postID = req.params.id
 

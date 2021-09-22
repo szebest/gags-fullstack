@@ -4,19 +4,16 @@ import { useEffect, useRef } from 'react'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
 
-function PostsContainer({posts, callForMore}) {
+function PostsContainer({posts, callForMore, sectionName}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
 
     useEffect(() => {
-        if (callForMore && isVisible) {
-            console.log("MORE")
-            callForMore()
-        }
-    }, [isVisible])
+        if (isVisible) callForMore()
+    }, [isVisible, sectionName])
 
     return (
-        <>
+        <div className={classes.postsContainerWrapper}>
             {posts.map((post) => {
                 return <Post 
                     _id={post._id}
@@ -34,7 +31,7 @@ function PostsContainer({posts, callForMore}) {
             <div className={classes.observer} ref={observeRef} >
                 
             </div>
-        </>
+        </div>
     );
 }
 

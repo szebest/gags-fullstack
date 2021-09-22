@@ -1,5 +1,5 @@
 import classes from './styles/ProfileSite.module.scss'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Redirect } from "react-router-dom"
 import Cookies from 'js-cookie'
 import axios from 'axios'

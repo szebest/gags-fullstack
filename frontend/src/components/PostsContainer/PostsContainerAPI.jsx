@@ -1,6 +1,6 @@
 import classes from './styles/PostsContainer.module.scss'
 import PostsContainer from './PostsContainer'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
@@ -34,16 +34,14 @@ function PostsContainerAPI({ sectionName }) {
     }
 
     useEffect(() => {
-        if (sectionName) {
-            setPosts([])
-            setPostNumber(0)
-            setPostsAvailable(true)
-        }
+        setPosts([])
+        setPostNumber(0)
+        setPostsAvailable(true)
     }, [sectionName])
 
     return (
         <div className={classes.postsContainerWrapper}>
-            <PostsContainer posts={posts} callForMore={sendRequest} />
+            <PostsContainer posts={posts} callForMore={sendRequest} sectionName={postsAvailable ? sectionName : ""} />
         </div>
     );
 }

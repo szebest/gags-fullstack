@@ -5,7 +5,7 @@ function Section({ name }) {
     return (
         <div className={classes.sectionWrapper}>
             <Link to={`/section/${name}`}>
-                <h4>{name}</h4>
+                <p>{name}</p>
             </Link>
         </div>
     );
