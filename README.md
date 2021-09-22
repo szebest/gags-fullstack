@@ -17,6 +17,7 @@
 
 ### The frontend is written with the help of:
 * React
+* Redux
 * HTML
 * Javascript
 * SASS, CSS
