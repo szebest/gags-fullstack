@@ -1,7 +1,8 @@
 .mainSiteWrapper {
+    position: relative;
     display: grid;
-    grid-template-columns: 25% 75%;
-    max-width: 90%;
+    grid-template-columns: 15% 85%;
+    width: 90%;
 }
 
 .siteCenter {

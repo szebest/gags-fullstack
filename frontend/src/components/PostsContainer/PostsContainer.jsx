@@ -13,7 +13,7 @@ function PostsContainer({posts, callForMore, sectionName}) {
     }, [isVisible, sectionName])
 
     return (
-        <div className={classes.postsContainerWrapper}>
+        <div className={classes.limitSpace}>
             {posts.map((post) => {
                 return <Post 
                     _id={post._id}

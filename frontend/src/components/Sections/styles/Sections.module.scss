@@ -1,7 +1,8 @@
 .sectionsWrapper {
     display: flex;
-    position: fixed;
-    left: 5%;
+    position: sticky;
+    top: 93px;
+    height: calc(100vh - 93px);
 
     &::after {
         content: '';
@@ -14,8 +15,11 @@
     }
 
     ul {
-        margin-right: 25px;
         list-style: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 15px;
 
         li {
             display: flex;
