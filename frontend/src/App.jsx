@@ -37,9 +37,16 @@ function App() {
     }
 
     useEffect(() => {
-        if (window.performance)
-            if (performance.navigation.type !== 1 && window.location.pathname === '/' && Cookies.get("refreshToken") !== 'undefined')
-                sendRefreshRequest()
+        if (window.location.pathname === '/' && Cookies.get("refreshToken") !== 'undefined') {
+            if (window.performance)
+                if (performance.navigation && performance.navigation.type !== 1)
+                    sendRefreshRequest()
+            else {
+                const navigationType = performance.getEntriesByType("navigation")[0]
+                if (navigationType && navigationType.type !== 'reload')
+                    sendRefreshRequest()
+        }
+        }
 
         const id = setInterval(() => {
             setAccessToken(Cookies.get('accessToken'))
