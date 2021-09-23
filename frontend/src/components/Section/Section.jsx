@@ -1,12 +1,19 @@
 import classes from './styles/Section.module.scss'
-import { Link } from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 function Section({ name }) {
+    const [clicked, setClicked] = useState(false)
+
+    useEffect(() => {
+        setClicked(false)
+    })
+
+    if (clicked)
+        return <Redirect to={`/section/${name}`} />
     return (
-        <div className={classes.sectionWrapper}>
-            <Link to={`/section/${name}`}>
-                <p>{name}</p>
-            </Link>
+        <div className={classes.sectionWrapper} onClick={() => setClicked(true)}>
+            <p>{name}</p>
         </div>
     );
 }

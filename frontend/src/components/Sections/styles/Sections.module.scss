@@ -4,36 +4,35 @@
     top: 93px;
     height: calc(100vh - 93px);
 
-    &::after {
+    &::before, &::after {
         content: '';
         display: block;
         position: absolute;
         right: 0;
-        width: 2px;
+        width: 3px;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
+        transform: translateX(100%);
+    }
+    
+    &::before {
+        left: 0;
+        transform: translateX(-100%);
     }
 
     ul {
         list-style: none;
         display: flex;
+        min-height: 100%;
         flex-direction: column;
-        justify-content: center;
-        padding: 15px;
+        justify-content: space-between;
+        padding-left: 0px;
+        margin: 0px;
+        overflow: hidden;
 
         li {
             display: flex;
             align-items: center;
-            margin: 25px 10px;
-
-            a {
-                text-decoration: none;
-                color: inherit;
-
-                h4 {
-                    margin: 0px;
-                }
-            }
         }
     }
 }
