@@ -16,10 +16,15 @@ function UploadSite() {
     const hasAccess = useSelector(state => state.hasAccess)
 
     useEffect(() => {
-        axios.get('http://localhost:3001/sections')
+        let cancel
+        axios.get('http://localhost:3001/sections', {
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        })
         .then(res => {
             setSections(res.data.sections)
         })
+
+        return () => cancel()
     }, [])
 
     if ((hasAccess !== null && !hasAccess) || redirect)
