@@ -3,7 +3,7 @@
     position: sticky;
     top: 86px;
     width: 100%;
-    height: calc(100vh - 8px);
+    height: calc(100vh - 86px);
 
     &::before, &::after {
         content: '';
