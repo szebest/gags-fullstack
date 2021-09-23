@@ -12,6 +12,8 @@ code {
     monospace;
 }
 
+*, *::after, *::before { box-sizing: border-box; }
+
 html {
   overflow-y: auto;
   overflow-y: overlay;

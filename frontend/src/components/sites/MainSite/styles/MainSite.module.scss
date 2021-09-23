@@ -1,11 +1,11 @@
 .mainSiteWrapper {
-    position: relative;
     display: grid;
     grid-template-columns: 15% auto;
     width: 90%;
 }
 
 .siteCenter {
+    position: relative;
     display: flex;
     justify-content: center;
 }
