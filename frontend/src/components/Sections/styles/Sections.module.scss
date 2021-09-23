@@ -1,8 +1,9 @@
 .sectionsWrapper {
     display: flex;
     position: sticky;
-    top: 93px;
-    height: calc(100vh - 93px);
+    top: 86px;
+    width: 100%;
+    height: calc(100vh - 8px);
 
     &::before, &::after {
         content: '';
