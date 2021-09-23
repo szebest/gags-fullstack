@@ -121,7 +121,7 @@ function ProfileSite() {
                             <p>Wow, such empty</p>
                         </div>
                     }
-                    {content && selected === 1 &&
+                    {selected === 1 &&
                         <PostsContainer posts={content} callForMore={getPostsLiked} />
                     }
                 </div>

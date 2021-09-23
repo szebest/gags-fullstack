@@ -19,7 +19,28 @@ function App() {
     const [accessToken, setAccessToken] = useState()
     const dispatch = useDispatch()
 
+    const sendRefreshRequest = () => {
+        axios.post('http://localhost:3001/refresh', {
+            refreshToken: Cookies.get('refreshToken')
+        })
+        .then(res => {
+            if (res.data.accessToken) {
+                Cookies.set('accessToken', res.data.accessToken)
+            }
+        })
+        .catch(err => {
+            //Error, force logout
+            Cookies.set('accessToken', undefined)
+            Cookies.set('refreshToken', undefined)
+            Cookies.set('expiresIn', undefined)
+        })
+    }
+
     useEffect(() => {
+        if (window.performance)
+            if (performance.navigation.type !== 1 && window.location.pathname === '/' && Cookies.get("refreshToken") !== 'undefined')
+                sendRefreshRequest()
+
         const id = setInterval(() => {
             setAccessToken(Cookies.get('accessToken'))
         }, 250)
@@ -41,20 +62,7 @@ function App() {
                                 unit === 'd' ? 1000 * 60 * 24 : 1000
                 const displacementScale = 0.75
                 id = setTimeout(() => {
-                    axios.post('http://localhost:3001/refresh', {
-                        refreshToken: Cookies.get('refreshToken')
-                    })
-                    .then(res => {
-                        if (res.data.accessToken) {
-                            Cookies.set('accessToken', res.data.accessToken)
-                        }
-                    })
-                    .catch(err => {
-                        //Error, force logout
-                        Cookies.set('accessToken', undefined)
-                        Cookies.set('refreshToken', undefined)
-                        Cookies.set('expiresIn', undefined)
-                    })
+                    sendRefreshRequest()
                 }, number * multiplier * displacementScale)
             }
         }
@@ -74,6 +82,7 @@ function App() {
             })
             .catch(err => {
                 //Error, force logout
+                console.log("ERROR LOGOUT")
                 Cookies.set('accessToken', undefined)
                 Cookies.set('refreshToken', undefined)
                 Cookies.set('expiresIn', undefined)
