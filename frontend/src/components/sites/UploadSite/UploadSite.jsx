@@ -22,7 +22,7 @@ function UploadSite() {
         })
     }, [])
 
-    if ((hasAccess !== undefined && !hasAccess) || redirect)
+    if ((hasAccess !== null && !hasAccess) || redirect)
         return <Redirect to="/" />
 
     const HandleSubmit = async (e) => {
@@ -74,6 +74,12 @@ function UploadSite() {
         }
         setFileSrc("")
     }
+
+    if (hasAccess === null) 
+        return (
+            <>
+            </>
+        )
 
     return (
         <div className={classes.uploadSiteWrapper}>

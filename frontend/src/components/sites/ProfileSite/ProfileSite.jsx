@@ -82,8 +82,14 @@ function ProfileSite() {
         setDaysActive(differenceInDays)
     }, [user])
 
-    if (hasAccess !== undefined && !hasAccess)
+    if (hasAccess !== null && !hasAccess)
         return <Redirect to="/" />
+
+    if (hasAccess === null) 
+        return (
+            <>
+            </>
+        )
 
     return (
         <div className={classes.siteCenter}>

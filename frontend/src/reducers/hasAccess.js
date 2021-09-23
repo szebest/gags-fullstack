@@ -1,4 +1,4 @@
-const inititalState = false
+const inititalState = null
 
 const hasAccessReducer = (state = inititalState, action) => {
     switch (action.type) {

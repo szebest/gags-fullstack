@@ -14,7 +14,7 @@ function RegisterSite() {
     const [fileSrc, setFileSrc] = useState("")
     const hasAccess = useSelector(state => state.hasAccess)
 
-    if (hasAccess !== undefined && hasAccess)
+    if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
 
     if (redirect)
@@ -87,6 +87,12 @@ function RegisterSite() {
         }
         setFileSrc("")
     }
+
+    if (hasAccess === null) 
+        return (
+            <>
+            </>
+        )
 
     return (
         <div className={classes.registerSiteWrapper}>

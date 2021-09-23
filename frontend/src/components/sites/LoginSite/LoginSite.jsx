@@ -13,7 +13,7 @@ function LoginSite() {
     const [, setLoading] = useState(false)
     const hasAccess = useSelector(state => state.hasAccess)
 
-    if (hasAccess !== undefined && hasAccess)
+    if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
 
     const handleSubmit = (e) => {
@@ -39,6 +39,12 @@ function LoginSite() {
             setLoading(false)
         })
     }
+
+    if (hasAccess === null) 
+        return (
+            <>
+            </>
+        )
 
     return (
         <div className={classes.loginSiteWrapper}>
