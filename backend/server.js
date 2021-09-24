@@ -147,7 +147,8 @@ app.post('/register', upload.single("file"), async (req, res) => {
         username: username,
         password: hashedPassword,
         imgSrc: fileSrc,
-        postsLiked: []
+        postsLiked: [],
+        postsCreated: []
     })
 
     try {
@@ -184,6 +185,14 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
 
     try {
         const newPost = await post.save()
+        
+        const user = (await User.find({ username }))[0]
+
+        user.postsCreated.push({})
+        user.postsCreated[user.postsCreated.length - 1].postId = newPost._id
+
+        await User.findOneAndUpdate({ username }, user)
+
         return res.status(201).json(newPost)
     }
     catch (err) {

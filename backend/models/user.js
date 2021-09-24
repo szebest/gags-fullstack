@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const userPostsRelationSchema = new mongoose.Schema({
+const userPostsLikeRelationSchema = new mongoose.Schema({
     postId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
@@ -15,6 +15,14 @@ const userPostsRelationSchema = new mongoose.Schema({
         default: Date.now
     }
 })
+
+const userPostsCreateRelationSchema = new mongoose.Schema({
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    }
+})
+
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -40,7 +48,8 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: "path"
     },
-    postsLiked: [userPostsRelationSchema]
+    postsLiked: [userPostsLikeRelationSchema],
+    postsCreated: [userPostsCreateRelationSchema]
 })
 
 module.exports = mongoose.model('user', userSchema)
