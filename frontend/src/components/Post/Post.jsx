@@ -2,6 +2,7 @@ import classes from './styles/Post.module.scss'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useSelector } from 'react-redux'
 
 function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked }) {
     const [loaded, setLoaded] = useState(false)
@@ -10,6 +11,11 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
     const [buttonClicked, setButtonClicked] = useState(alreadyLiked)
     const [actionLike, setActionLike] = useState('none')
     const [actionDisLike, setActionDisLike] = useState('none')
+    const hasAccess = useSelector(state => state.hasAccess)
+
+    useEffect(() => {
+        if (hasAccess !== undefined && !hasAccess) setButtonClicked(null)
+    }, [hasAccess])
 
     useEffect(() => {
         if (loaded) {
@@ -40,6 +46,7 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
     }, [likesState, dislikesState])
 
     const handleButtonClick = which => {
+        if (!hasAccess) return
         if (which === 'like') {
             if (buttonClicked === which) {
                 setButtonClicked(null)
