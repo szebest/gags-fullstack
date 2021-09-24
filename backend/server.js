@@ -188,8 +188,8 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
         
         const user = (await User.find({ username }))[0]
 
-        user.postsCreated.push({})
-        user.postsCreated[user.postsCreated.length - 1].postId = newPost._id
+        user.postsCreated.unshift({})
+        user.postsCreated[0].postId = newPost._id
 
         await User.findOneAndUpdate({ username }, user)
 
@@ -302,9 +302,9 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundUser.postsLiked[foundIndex].timestamp = Date.now
                 }
                 else {
-                    foundUser.postsLiked.push({})
-                    foundUser.postsLiked[foundUser.postsLiked.length - 1].postId = postObjectID
-                    foundUser.postsLiked[foundUser.postsLiked.length - 1].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
+                    foundUser.postsLiked.unshift({})
+                    foundUser.postsLiked[0].postId = postObjectID
+                    foundUser.postsLiked[0].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
                 }
             }
             else if (exists) {
