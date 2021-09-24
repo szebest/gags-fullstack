@@ -4,13 +4,13 @@ import { useEffect, useRef } from 'react'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
 
-function PostsContainer({posts, callForMore, sectionName}) {
+function PostsContainer({posts, callForMore, sectionName, ready}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
 
     useEffect(() => {
-        if (isVisible) callForMore()
-    }, [isVisible, sectionName])
+        if (isVisible && (ready !== undefined && ready || ready === undefined)) callForMore()
+    }, [isVisible, sectionName, ready])
 
     return (
         <div className={classes.limitSpace}>

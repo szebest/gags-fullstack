@@ -30,7 +30,6 @@ function ProfileSite() {
 
         const promises = []
         const requestArray = user.postsLiked.slice(postNumber, postNumber + postsPerRequest)
-        console.log(requestArray)
         requestArray.forEach((post) => {
             const promise = new Promise((resolve, reject) => {
                 axios.get(`http://localhost:3001/posts/${post.postId}`)
@@ -52,6 +51,45 @@ function ProfileSite() {
         })
 
         if (postNumber >= user.postsLiked.length) setPostsAvailable(false)
+        
+        setPostNumber(prev => prev + postsPerRequest)
+    }
+
+    const getPostsCreated = () => {
+        if (!postsAvailable) return
+    
+        const promises = []
+        const requestArray = user.postsCreated.slice(postNumber, postNumber + postsPerRequest)
+        requestArray.forEach((post) => {
+            const promise = new Promise((resolve, reject) => {
+                axios.get(`http://localhost:3001/posts/${post.postId}`)
+                .then(res => {
+                    const postReceived = res.data.post
+                    let actionType = null
+                    const exists = user.postsLiked.some((postLiked) => {
+                        if (post.postId.toString() === postLiked.postId.toString()) {
+                            actionType = postLiked.actionType
+                            return true
+                        }
+
+                        return false
+                    })
+                    postReceived.actionType = actionType
+                    resolve(postReceived)
+                })
+                .catch(err => {
+                    console.log(err)
+                    reject()
+                })
+            })
+            promises.push(promise)
+        })
+
+        Promise.all(promises).then((values) => {
+            setContent(prev => [...prev, ...values])
+        })
+
+        if (postNumber >= user.postsCreated.length) setPostsAvailable(false)
         
         setPostNumber(prev => prev + postsPerRequest)
     }
@@ -127,8 +165,11 @@ function ProfileSite() {
                             <p>Wow, such empty</p>
                         </div>
                     }
+                    {selected === 0 &&
+                        <PostsContainer posts={content} callForMore={getPostsCreated} ready={Object.keys(user).length !== 0} />
+                    }
                     {selected === 1 &&
-                        <PostsContainer posts={content} callForMore={getPostsLiked} />
+                        <PostsContainer posts={content} callForMore={getPostsLiked} ready={Object.keys(user).length !== 0} />
                     }
                 </div>
             </div>
