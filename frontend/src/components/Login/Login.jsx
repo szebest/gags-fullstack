@@ -4,22 +4,30 @@ import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import { io } from 'socket.io-client'
+
+const socket = io('http://localhost:3001')
 
 function Login() {
     const [user, setUser] = useState({})
     const hasAccess = useSelector(state => state.hasAccess)
 
     useEffect(() => {
-        if (hasAccess) {
+        socket.on('notification', (message) => alert(message))
+    }, [])
+
+    useEffect(() => {
+        if (hasAccess !== undefined && hasAccess) {
             axios.get(`http://localhost:3001/user/${Cookies.get("accessToken")}`)
             .then((res) => {
-                console.log(res.data.user)
                 setUser(res.data.user)
+                socket.emit('username', res.data.user.username)
             })
             .catch(err => {
                 console.log(err)
             })
         }
+        else if (hasAccess !== undefined) socket.emit('close')
     }, [hasAccess])
 
     const logout = async () => {

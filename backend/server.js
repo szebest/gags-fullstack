@@ -17,12 +17,17 @@ const upload = multer({
 const sharp = require('sharp')
 const { uploadFile } = require('./gcs')
 const dnsPrefetchControl = require('dns-prefetch-control')
+const { syncIndexes } = require('./models/user')
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URL)
 
 const db = mongoose.connection
 
 const sections = ['Funny', 'Wholesome', 'Awesome', 'Anime&Manga', 'NSFW', 'Animals', 'Random', 'WTF']
+
+const postLikeMilestones = [1, 10, 50, 100, 200, 500, 1000]
+
+const connectedUserSockets = []
 
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.error('Connected to database'))
@@ -148,7 +153,8 @@ app.post('/register', upload.single("file"), async (req, res) => {
         password: hashedPassword,
         imgSrc: fileSrc,
         postsLiked: [],
-        postsCreated: []
+        postsCreated: [],
+        notifications: []
     })
 
     try {
@@ -278,11 +284,27 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
 
     if (like || dislike) {
         try {
-            [await Posts.findById(postObjectID)].forEach(async (post) => {
+            let notificationMessage = ''
+            const foundPosts = [await Posts.findById(postObjectID)]
+            foundPosts.forEach(async (post) => {
+                const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
+                    milestone === post.likes + like && milestone === post.nextLikeMilestone)
+                const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
                 await Posts.updateOne(post, {$set: {
                     likes: post.likes + like,
-                    dislikes: post.dislikes + dislike
+                    dislikes: post.dislikes + dislike,
+                    nextLikeMilestone: foundMilestoneIndex > -1 ? 
+                                        (nextMilestoneExists ? 
+                                            postLikeMilestones[foundMilestoneIndex + 1] 
+                                            : -1) 
+                                        : post.nextLikeMilestone
                 }})
+
+                if (foundMilestoneIndex > -1) {
+                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} likes 👍`
+                    const socketObject = connectedUserSockets.find(obj => obj.username === post.author)
+                    if (socketObject) socketObject.socket.emit('notification', notificationMessage)
+                }
             })
 
             const foundUser = (await User.find({ username }))[0]
@@ -305,6 +327,10 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundUser.postsLiked.unshift({})
                     foundUser.postsLiked[0].postId = postObjectID
                     foundUser.postsLiked[0].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
+                }
+                if (notificationMessage !== '') {
+                    foundUser.notifications.unshift({})
+                    foundUser.notifications[0].message = notificationMessage
                 }
             }
             else if (exists) {
@@ -342,6 +368,30 @@ function authenticateToken(req, res, next) {
     }
 }
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`)
+})
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*"
+    }
+})
+
+io.on('connection', (socket) => {
+    const disconnect = () => {
+        const index = connectedUserSockets.findIndex(obj => obj.socket.id == socket.id)
+        if (index >= 0) connectedUserSockets.splice(index, 1)
+    }
+
+    socket.on('username', username => {
+        connectedUserSockets.push({
+            socket,
+            username
+        })
+    })
+
+    socket.on('close', () => disconnect())
+    socket.on('disconnect', () => disconnect())
+    
 })
