@@ -290,6 +290,11 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                 const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
                     milestone === post.likes + like && milestone === post.nextLikeMilestone)
                 const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
+                if (foundMilestoneIndex > -1) {
+                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} likes 👍`
+                    const socketObject = connectedUserSockets.find(obj => obj.username === post.author)
+                    if (socketObject) socketObject.socket.emit('notification', notificationMessage)
+                }
                 await Posts.updateOne(post, {$set: {
                     likes: post.likes + like,
                     dislikes: post.dislikes + dislike,
@@ -299,12 +304,6 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                                             : -1) 
                                         : post.nextLikeMilestone
                 }})
-
-                if (foundMilestoneIndex > -1) {
-                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} likes 👍`
-                    const socketObject = connectedUserSockets.find(obj => obj.username === post.author)
-                    if (socketObject) socketObject.socket.emit('notification', notificationMessage)
-                }
             })
 
             const foundUser = (await User.find({ username }))[0]
@@ -331,6 +330,8 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                 if (notificationMessage !== '') {
                     foundUser.notifications.unshift({})
                     foundUser.notifications[0].message = notificationMessage
+                    foundUser.notifications[0].refId = postObjectID
+                    foundUser.notifications[0].notificationType = 'post'
                 }
             }
             else if (exists) {

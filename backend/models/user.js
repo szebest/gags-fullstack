@@ -17,6 +17,14 @@ const userPostsLikeRelationSchema = new mongoose.Schema({
 })
 
 const userNotification = new mongoose.Schema({
+    refId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    notificationType: {
+        type: String,
+        required: true
+    },
     message: {
         type: String,
         required: true
