@@ -18,6 +18,10 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
     }, [hasAccess])
 
     useEffect(() => {
+        setButtonClicked(alreadyLiked)
+    }, [alreadyLiked])
+
+    useEffect(() => {
         if (loaded) {
             const sendLikes = actionLike === 'none' ? 0 : (actionLike === 'add' ? 1 : -1)
             const sendDisLikes = actionDisLike === 'none' ? 0 : (actionDisLike === 'add' ? 1 : -1)
