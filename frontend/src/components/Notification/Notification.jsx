@@ -2,7 +2,7 @@ import classes from './styles/Notification.module.scss'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-function Notification({ data }) {
+function Notification({ data, setRead, index }) {
     const sendRequest = () => {
         axios({
             method: "PATCH",
@@ -11,7 +11,9 @@ function Notification({ data }) {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }
         })
-        .then(res => {})
+        .then(res => {
+            setRead(index)
+        })
         .catch(err => {})
     }
 

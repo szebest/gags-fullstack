@@ -1,8 +1,15 @@
 import classes from './styles/Notifications.module.scss'
 import { Scrollbars } from 'react-custom-scrollbars';
 import Notification from '../Notification/Notification';
+import { useState, useEffect } from 'react'
 
 function Notifications({ data, showModal }) {
+    const [dataState, setDataState] = useState(data)
+
+    useEffect(() => {
+        setDataState(data)
+    }, [data])
+
     if (!data)
         return <></>
 
@@ -10,6 +17,11 @@ function Notifications({ data, showModal }) {
         if (currentValue.read) return previousValue
         else return previousValue + 1
     }, 0)
+
+    const setRead = (index) => {
+        dataState[index].read = true
+        setDataState(prev => [...prev])
+    }
 
     return (
         <div className={classes.notificationsWrapper}>
@@ -24,8 +36,8 @@ function Notifications({ data, showModal }) {
                 autoHide
                 autoHideTimeout={500}
                 autoHideDuration={200}>
-                    {data.map((notification) => 
-                        <Notification key={notification._id} data={notification} />
+                    {dataState.map((notification, index) => 
+                        <Notification key={notification._id} data={notification} setRead={setRead} index={index} />
                     )}
                 </Scrollbars>
             </div>
