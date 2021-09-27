@@ -1,0 +1,39 @@
+.notificationsWrapper {
+    cursor: initial;
+}
+
+.unreadAmount {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25px;
+    height: 25px;
+    background-color: red;
+    border-radius: 50%;
+    transform: translate(25%, -25%);
+    display: flex;
+    justify-content: center;
+    align-content: center;
+
+    p {
+        user-select: none;
+        font-size: initial;
+        font-weight: initial;
+        color: white;
+        margin: 0px auto;
+        font-size: 1.25rem;
+        font-weight: bold;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    }
+}
+
+.notificationsContent {
+    background-color: white;
+    border: 1px solid black;
+    width: 45vh;
+    height: 80vh;
+    position: absolute;
+    transform: translate(-50%, 15px);
+    z-index: 1000;
+    overflow: hidden;
+}

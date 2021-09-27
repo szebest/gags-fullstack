@@ -16,6 +16,31 @@ const userPostsLikeRelationSchema = new mongoose.Schema({
     }
 })
 
+const userNotification = new mongoose.Schema({
+    refId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    notificationType: {
+        type: String,
+        required: true
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    read: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
+
 const userPostsCreateRelationSchema = new mongoose.Schema({
     postId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -49,7 +74,8 @@ const userSchema = new mongoose.Schema({
         default: "path"
     },
     postsLiked: [userPostsLikeRelationSchema],
-    postsCreated: [userPostsCreateRelationSchema]
+    postsCreated: [userPostsCreateRelationSchema],
+    notifications: [userNotification]
 })
 
 module.exports = mongoose.model('user', userSchema)

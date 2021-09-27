@@ -17,12 +17,17 @@ const upload = multer({
 const sharp = require('sharp')
 const { uploadFile } = require('./gcs')
 const dnsPrefetchControl = require('dns-prefetch-control')
+const { syncIndexes } = require('./models/user')
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URL)
 
 const db = mongoose.connection
 
 const sections = ['Funny', 'Wholesome', 'Awesome', 'Anime&Manga', 'NSFW', 'Animals', 'Random', 'WTF']
+
+const postLikeMilestones = [1, 10, 50, 100, 200, 500, 1000]
+
+const connectedUserSockets = []
 
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.error('Connected to database'))
@@ -148,7 +153,8 @@ app.post('/register', upload.single("file"), async (req, res) => {
         password: hashedPassword,
         imgSrc: fileSrc,
         postsLiked: [],
-        postsCreated: []
+        postsCreated: [],
+        notifications: []
     })
 
     try {
@@ -202,6 +208,32 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
 
 app.get('/sections', (req, res) => {
     res.status(200).send({ sections: sections})
+})
+
+app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
+    const notificationID = req.params.id
+    const username = req.username
+    const updatedRead = req.query.read === 'true' ? true : req.query.read === 'false' ? false : undefined
+
+    if (!updatedRead)
+        return res.sendStatus(400)
+    
+    try {
+        const foundUser = (await User.find({ username }).lean())[0]
+
+        foundUser.notifications.forEach((notification, index) => {
+            if (notification._id.toString() === notificationID.toString()) 
+                foundUser.notifications[index].read = updatedRead
+        })
+
+        await User.findOneAndUpdate({ username }, foundUser)
+
+        return res.sendStatus(200)
+    }
+    catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
 })
 
 app.get('/user/:accessToken', (req, res) => {
@@ -278,10 +310,25 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
 
     if (like || dislike) {
         try {
-            [await Posts.findById(postObjectID)].forEach(async (post) => {
+            let notificationMessage = ''
+            let sockejObject
+            const foundPosts = [await Posts.findById(postObjectID)]
+            foundPosts.forEach(async (post) => {
+                const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
+                    milestone === post.likes + like && milestone === post.nextLikeMilestone)
+                const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
+                if (foundMilestoneIndex > -1) {
+                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} ${postLikeMilestones[foundMilestoneIndex] === 1 ? 'like' : 'likes'} 👍`
+                    socketObject = connectedUserSockets.find(obj => obj.username === post.author)
+                }
                 await Posts.updateOne(post, {$set: {
                     likes: post.likes + like,
-                    dislikes: post.dislikes + dislike
+                    dislikes: post.dislikes + dislike,
+                    nextLikeMilestone: foundMilestoneIndex > -1 ? 
+                                        (nextMilestoneExists ? 
+                                            postLikeMilestones[foundMilestoneIndex + 1] 
+                                            : -1) 
+                                        : post.nextLikeMilestone
                 }})
             })
 
@@ -306,12 +353,20 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundUser.postsLiked[0].postId = postObjectID
                     foundUser.postsLiked[0].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
                 }
+                if (notificationMessage !== '') {
+                    foundUser.notifications.unshift({})
+                    foundUser.notifications[0].message = notificationMessage
+                    foundUser.notifications[0].refId = postObjectID
+                    foundUser.notifications[0].notificationType = 'post'
+                }
             }
             else if (exists) {
                 foundUser.postsLiked.splice(foundIndex, 1)
             }
 
-            await User.findOneAndUpdate({ username }, foundUser)
+            const updatedUser = await User.findOneAndUpdate({ username }, foundUser, {new: true})
+
+            if (socketObject) socketObject.socket.emit('notification', updatedUser.notifications[0])
 
             return res.sendStatus(200)
         }
@@ -342,6 +397,30 @@ function authenticateToken(req, res, next) {
     }
 }
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`)
+})
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*"
+    }
+})
+
+io.on('connection', (socket) => {
+    const disconnect = () => {
+        const index = connectedUserSockets.findIndex(obj => obj.socket.id == socket.id)
+        if (index >= 0) connectedUserSockets.splice(index, 1)
+    }
+
+    socket.on('username', username => {
+        connectedUserSockets.push({
+            socket,
+            username
+        })
+    })
+
+    socket.on('close', () => disconnect())
+    socket.on('disconnect', () => disconnect())
+    
 })

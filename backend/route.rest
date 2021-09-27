@@ -2,7 +2,7 @@ POST http://localhost:3001/login
 Content-Type: application/json
 
 {
-    "username": "szebest",
+    "username": "aaaa",
     "password": "aaaaaa"
 }
 
@@ -66,3 +66,10 @@ Content-Type: application/json
 PATCH http://localhost:3001/posts/614721583f888e75f4a0cbc5?dislike=1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN6ZWJlc3QiLCJpYXQiOjE2MzIxMzM1NjgsImV4cCI6MTYzMjEzNDE2OH0.0tKaOJDLDXXnp2OGxkCiX0whskhbI5K6X_okB2ysGHo
+
+###
+
+PATCH http://localhost:3001/user/notification/111?read=false
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWEiLCJpYXQiOjE2MzI3NTk2MjEsImV4cCI6MTYzMjc2MDUyMX0.mPDez8dx5GUpEgn_ptfkCx9TReCYPePdYE20DeQZRqg
+
