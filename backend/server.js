@@ -285,15 +285,15 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
     if (like || dislike) {
         try {
             let notificationMessage = ''
+            let sockejObject
             const foundPosts = [await Posts.findById(postObjectID)]
             foundPosts.forEach(async (post) => {
                 const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
                     milestone === post.likes + like && milestone === post.nextLikeMilestone)
                 const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
                 if (foundMilestoneIndex > -1) {
-                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} likes 👍`
-                    const socketObject = connectedUserSockets.find(obj => obj.username === post.author)
-                    if (socketObject) socketObject.socket.emit('notification', notificationMessage)
+                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} ${postLikeMilestones[foundMilestoneIndex] === 1 ? 'like' : 'likes'} 👍`
+                    socketObject = connectedUserSockets.find(obj => obj.username === post.author)
                 }
                 await Posts.updateOne(post, {$set: {
                     likes: post.likes + like,
@@ -338,7 +338,9 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                 foundUser.postsLiked.splice(foundIndex, 1)
             }
 
-            await User.findOneAndUpdate({ username }, foundUser)
+            const updatedUser = await User.findOneAndUpdate({ username }, foundUser, {new: true})
+
+            if (socketObject) socketObject.socket.emit('notification', updatedUser.notifications[0])
 
             return res.sendStatus(200)
         }
