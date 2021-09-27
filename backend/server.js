@@ -312,8 +312,10 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
         try {
             let notificationMessage = ''
             let sockejObject
+            let postAuthor = ''
             const foundPosts = [await Posts.findById(postObjectID)]
             foundPosts.forEach(async (post) => {
+                postAuthor = post.author
                 const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
                     milestone === post.likes + like && milestone === post.nextLikeMilestone)
                 const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
@@ -353,18 +355,22 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundUser.postsLiked[0].postId = postObjectID
                     foundUser.postsLiked[0].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
                 }
-                if (notificationMessage !== '') {
-                    foundUser.notifications.unshift({})
-                    foundUser.notifications[0].message = notificationMessage
-                    foundUser.notifications[0].refId = postObjectID
-                    foundUser.notifications[0].notificationType = 'post'
-                }
             }
-            else if (exists) {
-                foundUser.postsLiked.splice(foundIndex, 1)
-            }
+            else if (exists) foundUser.postsLiked.splice(foundIndex, 1)
 
             const updatedUser = await User.findOneAndUpdate({ username }, foundUser, {new: true})
+
+            if (like > 0 && notificationMessage !== '' && postAuthor !== '') {
+                const foundAuthor = (await User.find({ postAuthor }))[0]
+                console.log(foundAuthor.username)
+                console.log(postAuthor)
+                foundAuthor.notifications.unshift({})
+                foundAuthor.notifications[0].message = notificationMessage
+                foundAuthor.notifications[0].refId = postObjectID
+                foundAuthor.notifications[0].notificationType = 'post'
+
+                await User.findOneAndUpdate({ postAuthor }, foundAuthor)
+            }
 
             if (socketObject) socketObject.socket.emit('notification', updatedUser.notifications[0])
 
