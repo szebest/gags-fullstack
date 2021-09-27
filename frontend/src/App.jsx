@@ -37,8 +37,6 @@ function App() {
     }
 
     useEffect(() => {
-        sendRefreshRequest()
-
         const id = setInterval(() => {
             setAccessToken(Cookies.get('accessToken'))
         }, 250)
@@ -50,7 +48,8 @@ function App() {
 
     useEffect(() => {
         let id
-        if (accessToken !== undefined) {
+        if (accessToken !== 'undefined') {
+            sendRefreshRequest()
             const str = Cookies.get('expiresIn')
             if (str !== 'undefined') {
                 const number = parseInt(str, 10)
