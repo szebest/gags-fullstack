@@ -1,9 +1,16 @@
 import classes from './styles/Notification.module.scss'
 import axios from 'axios'
+import Cookies from 'js-cookie'
 
 function Notification({ data }) {
     const sendRequest = () => {
-        axios.patch(`http://localhost:3001/user/notification/${data._id}?read=true`)
+        axios({
+            method: "PATCH",
+            url: `http://localhost:3001/user/notification/${data._id}?read=true`,
+            headers: { 
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
         .then(res => {})
         .catch(err => {})
     }

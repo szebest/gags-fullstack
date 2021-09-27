@@ -210,6 +210,32 @@ app.get('/sections', (req, res) => {
     res.status(200).send({ sections: sections})
 })
 
+app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
+    const notificationID = req.params.id
+    const username = req.username
+    const updatedRead = req.query.read === 'true' ? true : req.query.read === 'false' ? false : undefined
+
+    if (!updatedRead)
+        return res.sendStatus(400)
+    
+    try {
+        const foundUser = (await User.find({ username }).lean())[0]
+
+        foundUser.notifications.forEach((notification, index) => {
+            if (notification._id.toString() === notificationID.toString()) 
+                foundUser.notifications[index].read = updatedRead
+        })
+
+        await User.findOneAndUpdate({ username }, foundUser)
+
+        return res.sendStatus(200)
+    }
+    catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
+})
+
 app.get('/user/:accessToken', (req, res) => {
     const accessToken = req.params.accessToken
 
