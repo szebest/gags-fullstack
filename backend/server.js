@@ -311,7 +311,7 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
     if (like || dislike) {
         try {
             let notificationMessage = ''
-            let sockejObject
+            let socketObject
             let postAuthor = ''
             const foundPosts = [await Posts.findById(postObjectID)]
             foundPosts.forEach(async (post) => {
@@ -370,9 +370,9 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                 foundAuthor.notifications[0].notificationType = 'post'
 
                 await User.findOneAndUpdate({ postAuthor }, foundAuthor)
-            }
 
-            if (socketObject) socketObject.socket.emit('notification', updatedUser.notifications[0])
+                if (socketObject) socketObject.socket.emit('notification', foundAuthor.notifications[0])
+            }
 
             return res.sendStatus(200)
         }
