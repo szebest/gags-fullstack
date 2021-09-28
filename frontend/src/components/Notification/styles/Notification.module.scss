@@ -14,10 +14,11 @@
 }
 
 .notification {
-    position: absolute;
+    display: block;
     left: 5%;
     font-size: 1rem;
     font-weight: 400;
+    min-height: fit-content;
     width: 90%;
     display: flex;
     justify-content: center;

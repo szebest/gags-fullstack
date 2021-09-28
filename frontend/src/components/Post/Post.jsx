@@ -103,8 +103,8 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
             <div className={classes.center}>
                 <h6>Posted in {section} by {author}</h6>
             </div>
-            <div className={classes.imageContainer}>
-                <img hidden={!loaded} onLoad={() => setLoaded(true)} src={imgSrc} className={classes.image} />
+            <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
+                <img onLoad={() => setLoaded(true)} src={imgSrc} className={classes.image} />
             </div>
             <div className={classes.statistics}>
                 <div className={buttonClicked === 'like' ? classes.clicked : ""} onClick={() => handleButtonClick("like")}>
