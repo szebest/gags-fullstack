@@ -1,3 +1,9 @@
+.relativeWrapper {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
 .sectionsWrapper {
     display: flex;
     position: sticky;
@@ -36,4 +42,83 @@
             align-items: center;
         }
     }
+}
+
+.toggleButtonWrapper {
+    --size: clamp(25px, 5vw, 50px);
+    cursor: pointer;
+    position: sticky;
+    top: 96px;
+    right: 0px;
+    width: var(--size);
+    height: var(--size);
+    transform: translateX(50%);
+    z-index: 1000;
+    visibility: hidden;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.25);
+    }
+}
+
+.toggleButton {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    
+    div {
+        height: 4px;
+        width: var(--size);
+        background-color: black;
+    }
+
+    &::before, &::after {
+        content: '';
+        display: block;
+        height: 4px;
+        width: var(--size);
+        position: absolute;
+        background-color: black;
+    }
+
+    &::before {
+        top: calc(10 * var(--size) / 100);
+    }
+
+    &::after {
+        bottom: calc(10 * var(--size) / 100);
+    }
+}
+
+@media (max-width: 1200px) {
+    .sectionsWrapper {
+        &::before, &::after {
+            visibility: hidden;
+        }
+    }
+
+    .fixedSectionsWrapper {
+        position: fixed;
+        top: 0px;
+        left: -50vw;
+        width: 60vw;
+        height: 100vh;
+        background-color: white;
+        opacity: 0;
+        transition: left 300ms linear, opacity 300ms linear;
+    }
+
+    .toggleButtonWrapper {
+        visibility: visible;
+    }
+}
+
+.visible {
+    left: 0px;
+    opacity: 1;
+    z-index: 1001;
 }

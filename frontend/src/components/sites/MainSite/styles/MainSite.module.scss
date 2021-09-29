@@ -1,7 +1,13 @@
 .mainSiteWrapper {
     display: grid;
-    grid-template-columns: 15% auto;
+    grid-template-columns: 20% auto;
     width: 90%;
+}
+
+@media (max-width: 1200px) {
+    .mainSiteWrapper {
+        grid-template-columns: 0% 100%;
+    }
 }
 
 .siteCenter {

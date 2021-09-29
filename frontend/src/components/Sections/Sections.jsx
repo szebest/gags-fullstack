@@ -6,6 +6,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 
 function Sections() {
     const [sections, setSections] = useState([])
+    const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
         let cancel
@@ -20,18 +21,23 @@ function Sections() {
     }, [])
 
     return (
-        <div className={classes.relativeWrapper}>
-            <div className={classes.sectionsWrapper}>
+        <div className={classes.relativeWrapper} tabIndex="0" onBlur={() => setShowModal(false)}>
+            <div className={`${classes.sectionsWrapper} ${classes.fixedSectionsWrapper} ${showModal ? classes.visible : ""}`}>
                 <Scrollbars 
                     autoHide
                     autoHideTimeout={500}
                     autoHideDuration={200}>
                     <ul>
                         {sections.map((sectionName, index) => 
-                            <li key={index}><Section name={sectionName} /></li>
+                            <li onClick={() => setShowModal(false)} key={index}><Section name={sectionName} /></li>
                         )}
                     </ul>
                 </Scrollbars>
+            </div>
+            <div className={classes.toggleButtonWrapper} onClick={() => setShowModal(prev => !prev)}>
+                <div className={classes.toggleButton}>
+                    <div></div>
+                </div>
             </div>
         </div>
     );
