@@ -114,7 +114,13 @@
 
     .toggleButtonWrapper {
         visibility: visible;
+        transition: opacity 300ms linear;
     }
+}
+
+.hideButton {
+    opacity: 0;
+    cursor: initial;
 }
 
 .visible {

@@ -1,14 +1,30 @@
 import classes from './styles/Sections.module.scss'
 import Section from '../Section/Section'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Scrollbars } from 'react-custom-scrollbars';
 
 function Sections() {
     const [sections, setSections] = useState([])
     const [showModal, setShowModal] = useState(false)
+    const [hideButton, setHideButton] = useState(false)
+    const scrollValueRef = useRef(0)
+
+    const handleScroll = () => {
+        const previousScrollY = scrollValueRef.current
+        const difference = window.scrollY - previousScrollY
+        if (difference > 200) {
+            setHideButton(true)
+            scrollValueRef.current = window.scrollY
+        }
+        else if (difference < -200) {
+            setHideButton(false)
+            scrollValueRef.current = window.scrollY
+        }
+    }
 
     useEffect(() => {
+        scrollValueRef.current = window.scrollY
         let cancel
         axios.get('http://localhost:3001/sections', {
             cancelToken: new axios.CancelToken(c => cancel = c)
@@ -17,7 +33,12 @@ function Sections() {
             setSections(res.data.sections)
         })
 
-        return () => cancel()
+        window.addEventListener('scroll', handleScroll)
+
+        return () => {
+            cancel()
+            window.removeEventListener('scroll', handleScroll)
+        }
     }, [])
 
     return (
@@ -34,7 +55,7 @@ function Sections() {
                     </ul>
                 </Scrollbars>
             </div>
-            <div className={classes.toggleButtonWrapper} onClick={() => setShowModal(prev => !prev)}>
+            <div className={`${classes.toggleButtonWrapper} ${hideButton ? classes.hideButton : ""}`} onClick={() => hideButton ? {} : setShowModal(prev => !prev)}>
                 <div className={classes.toggleButton}>
                     <div></div>
                 </div>
