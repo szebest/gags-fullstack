@@ -17,3 +17,9 @@
     position: absolute;
     bottom: 600px;
 }
+
+@media (max-width: 800px) {
+    .limitSpace {
+        width: 100%;
+    }
+}
