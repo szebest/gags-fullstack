@@ -186,7 +186,8 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
         author: username,
         title,
         section,
-        imgSrc: fileSrc
+        imgSrc: fileSrc,
+        comments: []
     })
 
     try {
@@ -274,6 +275,9 @@ app.get('/posts', async (req, res) => {
             slicedPosts.forEach((post, index) => {
                 if (likedPost.postId.toString() === post._id.toString())
                     slicedPosts[index].actionType = likedPost.actionType
+
+                let {comments, ...slicedPostWithoutComments} = slicedPosts[index]
+                slicedPosts[index] = slicedPostWithoutComments
             })
         })
 
@@ -286,6 +290,34 @@ app.get('/posts', async (req, res) => {
     catch(err) {
         console.log(err)
         return res.status(400)
+    }
+})
+
+app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
+    const postID = req.params.id
+    const comment = req.body.comment
+    const parentCommentID = req.body.parentComment ?? undefined
+    const username = req.username
+
+    try {
+        const found = await Posts.findById(postID).lean()
+
+        found.comments = found.comments ?? []
+        const commentsLength = found.comments.length
+        found.comments.push({})
+        found.comments[commentsLength].postID = postID
+        parentCommentID ? found.comments[commentsLength].parentCommentId = parentCommentID : ""
+        found.comments[commentsLength].author = username
+        found.comments[commentsLength].comment = comment
+        found.comments[commentsLength].likes = 0
+        found.comments[commentsLength].dislikes = 0
+
+        await Posts.findByIdAndUpdate(postID, found)
+
+        return res.status(200).send({ post: found })
+    }
+    catch(err) {
+        return res.sendStatus(400)
     }
 })
 

@@ -1,5 +1,39 @@
 const mongoose = require('mongoose')
 
+const postCommentRelationSchema = new mongoose.Schema({
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    parentCommentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false
+    },
+    author: {
+        type: String,
+        requred: true
+    },
+    comment: {
+        type: String,
+        required: true
+    },
+    likes: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    dislikes: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
+
 const postsSchema = new mongoose.Schema({
     author: {
         type: String,
@@ -37,7 +71,8 @@ const postsSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: 1
-    }
+    },
+    comments: [postCommentRelationSchema]
 })
 
 module.exports = mongoose.model('posts', postsSchema)

@@ -73,3 +73,15 @@ PATCH http://localhost:3001/user/notification/111?read=false
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWEiLCJpYXQiOjE2MzI3NTk2MjEsImV4cCI6MTYzMjc2MDUyMX0.mPDez8dx5GUpEgn_ptfkCx9TReCYPePdYE20DeQZRqg
 
+###
+POST http://localhost:3001/posts/6150bb3bde9f22c59d19119d/comment
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWEiLCJpYXQiOjE2MzM4MDQzOTIsImV4cCI6MTYzMzgwNTI5Mn0.a4cPuUy26WJV5y3Tx9l5B7kQFWfIOn1XH5ItjWggAis
+
+{
+    "comment": "XD"
+}
+
+###
+GET http://localhost:3001/posts/6150bb3bde9f22c59d19119d
+Content-Type: application/json
