@@ -30,10 +30,18 @@
 .notificationsContent {
     background-color: white;
     border: 1px solid black;
-    width: 20vh;
+    width: 25vw;
     height: 80vh;
     position: absolute;
     transform: translate(-50%, 15px);
     z-index: 1000;
     overflow: hidden;
+}
+
+@media (max-width: 1000px) {
+    .notificationsContent {
+        height: 60vh;
+        transform: translateX(-105%);
+        top: 0px;
+    }
 }

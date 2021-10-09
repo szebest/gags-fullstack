@@ -102,7 +102,6 @@ function UploadSite() {
                     </select>
                     <input ref={imageRef} type="file" accept=".jpg,.png" onChange={handleImageChange} />
                     <input type="submit" value="Submit" disabled={submitClicked} />
-
                 </form>
             </div>
         </div>

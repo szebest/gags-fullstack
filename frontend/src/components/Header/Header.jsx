@@ -1,5 +1,5 @@
 import classes from './styles/Header.module.scss'
-import Login from '../Login/Login'
+import Navbar from '../Navbar/Navbar'
 import { Link } from "react-router-dom"
 
 function Header() {
@@ -11,11 +11,11 @@ function Header() {
                         <li>
                             <Link to="/"><h1>GAGS</h1></Link>
                         </li>
-                        <li>
+                        <li className={classes.about}>
                             <Link to="/about">ABOUT</Link>
                         </li>
                     </ul>
-                    <Login />
+                    <Navbar />
                 </div>
             </div>
         </header>

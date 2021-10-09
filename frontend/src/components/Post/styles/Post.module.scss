@@ -5,6 +5,11 @@
     position: relative;
     align-items: center;
     margin: 0 25px;
+    
+    h2 {
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+    }
 }
 
 .center {

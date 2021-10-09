@@ -37,3 +37,16 @@
         margin: 20px 0px;
     }
 }
+
+@media (max-width: 1000px) {
+    .uploadSiteWrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        >div {
+            min-width: 100%;
+        }
+    }
+}

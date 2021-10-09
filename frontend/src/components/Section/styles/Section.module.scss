@@ -5,6 +5,7 @@
     width: 100%;
     cursor: pointer;
     border-radius: 5px;
+    margin-left: 3px;
 
     p {
         width: max-content;
@@ -21,4 +22,10 @@
 .active {
     background-color: #9bd4e7;
     border-color: #111;
+}
+
+@media (max-width: 1200px) {
+    .sectionWrapper {
+        margin-left: 0px;
+    }
 }
