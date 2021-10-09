@@ -130,3 +130,9 @@
     opacity: 1;
     z-index: 1001;
 }
+
+@media (max-width: 800px) {
+    .toggleButtonWrapper {
+        transform: translateX(-100%);
+    }
+}

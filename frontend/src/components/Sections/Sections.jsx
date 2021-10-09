@@ -13,11 +13,11 @@ function Sections() {
     const handleScroll = () => {
         const previousScrollY = scrollValueRef.current
         const difference = window.scrollY - previousScrollY
-        if (difference > 200) {
+        if (difference > 400) {
             setHideButton(true)
             scrollValueRef.current = window.scrollY
         }
-        else if (difference < -200) {
+        else if (difference < -400) {
             setHideButton(false)
             scrollValueRef.current = window.scrollY
         }
