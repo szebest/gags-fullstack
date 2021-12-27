@@ -110,6 +110,9 @@ function App() {
                 <Route exact path="/profile">
                     <ProfileSite />
                 </Route>
+                <Route exact path="/profile/:profileName">
+                    <ProfileSite />
+                </Route>
                 <Route path="/post/:postID">
                     <MainSite />
                     <PostModal></PostModal>

@@ -5,8 +5,39 @@
     transform: translate(-50%, -50%);
     background-color: white;
     z-index: 10000;
-    min-width: 75%;
-    min-height: 75%;
+    width: 90%;
+    height: 90%;
+    > div {
+        > div {
+            > div {
+                padding-bottom: 25px;
+            }
+        }
+    }
+    img {
+        max-height: 500px;
+    }
+}
+
+.fadeIn {
+    opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 0.25s;
+}
+
+.dur1s {
+    animation-duration: 1s;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 
 .overlay {
@@ -15,8 +46,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     z-index: 10000;
+    cursor: default;
 }
 
 .postsContainerWrapper {
@@ -32,4 +64,102 @@
 .limitSpace {
     width: 80%;
     min-height: 100%;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.newComment {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+
+    > textarea {
+        align-self: center;
+        resize: vertical;
+        width: 90%;
+        min-height: 75px;
+        max-height: 300px;
+    }
+
+    > button {
+        align-self: center;
+        width: 90%;
+    }
+}
+
+.commentWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 90%;
+    align-self: center;
+}
+
+.commentSplit {
+    display: flex;
+    flex-direction: column;
+    outline: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.commentContainer {
+    display: grid;
+    grid-template-columns: 30px auto;
+    padding: 5px 0 5px 0;
+}
+
+.contentHolder {
+    padding-left: 10px;
+}
+
+.profilePictureHolder {
+    padding-left: 5px;
+    img {
+        border-radius: 50%;
+    }
+}
+
+.author {
+
+    a {
+        color: inherit;
+        text-decoration: inherit;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.commentControl {
+    display: flex;
+    flex-direction: row;
+    padding-left: 7px;
+    padding-bottom: 5px;
+}
+
+.controlContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 50px;
+    height: 30px;
+    align-items: center;
+
+    p {
+        margin: 0px;
+    }
+}
+
+.hoverBackground {
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(150, 150, 150, 0.5);
+    }
 }

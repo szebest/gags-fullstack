@@ -7,8 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body.modal-open {
-  height: 100vh;
+body.modal-open, html.modal-open {
   overflow-y: hidden;
 }
 
