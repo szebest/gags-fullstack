@@ -1,10 +1,11 @@
 import classes from './styles/Post.module.scss'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked }) {
+function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked, sectionURL }) {
     const [loaded, setLoaded] = useState(false)
     const [likesState, setLikesState] = useState(likes)
     const [dislikesState, setDisLikesState] = useState(dislikes)
@@ -12,6 +13,11 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
     const [actionLike, setActionLike] = useState('none')
     const [actionDisLike, setActionDisLike] = useState('none')
     const hasAccess = useSelector(state => state.hasAccess)
+    const imageRef = useRef()
+
+    const handleClick = () => {
+        localStorage.setItem('scrollY', window.scrollY)
+    }
 
     useEffect(() => {
         if (hasAccess !== undefined && !hasAccess) setButtonClicked(null)
@@ -97,15 +103,19 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
 
     return (
         <div className={classes.postWrapper}>
-            <div className={classes.center}>
-                <h2>{title}</h2>
-            </div>
+            <Link to={`/post/${_id}`} onClick={handleClick}>
+                <div className={classes.center}>
+                    <h2>{title}</h2>
+                </div>
+            </Link>
             <div className={classes.center}>
                 <h6>Posted in {section} by {author}</h6>
             </div>
-            <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
-                <img onLoad={() => setLoaded(true)} src={imgSrc} className={classes.image} />
-            </div>
+            <Link to={sectionURL === undefined ? `/post/${_id}` : `/section/${sectionURL}/post/${_id}`} onClick={handleClick}>
+                <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
+                    <img onLoad={() => setLoaded(true)} style={{height: imageRef.current ? imageRef.current.naturalHeight + "px" : "inherit"}} src={imgSrc} className={classes.image} />
+                </div>
+            </Link>
             <div className={classes.statistics}>
                 <div className={buttonClicked === 'like' ? classes.clicked : ""} onClick={() => handleButtonClick("like")}>
                     <p>▲</p>

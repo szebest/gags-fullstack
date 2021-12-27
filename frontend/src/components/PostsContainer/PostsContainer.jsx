@@ -25,6 +25,7 @@ function PostsContainer({posts, callForMore, sectionName, ready}) {
                     likes={post.likes} 
                     dislikes={post.dislikes}
                     alreadyLiked={post.actionType}
+                    sectionURL={sectionName}
                     />
             }
             )}

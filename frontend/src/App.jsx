@@ -14,6 +14,7 @@ import axios from 'axios'
 import ProfileSite from './components/sites/ProfileSite/ProfileSite'
 import { useDispatch } from 'react-redux'
 import { setHasAccess } from './actions'
+import PostModal from './components/PostModal/PostModal'
 
 function App() {
     const [accessToken, setAccessToken] = useState()
@@ -108,6 +109,14 @@ function App() {
                 </Route>
                 <Route exact path="/profile">
                     <ProfileSite />
+                </Route>
+                <Route path="/post/:postID">
+                    <MainSite />
+                    <PostModal></PostModal>
+                </Route>
+                <Route path="/section/:sectionName/post/:postID">
+                    <MainSite />
+                    <PostModal></PostModal>
                 </Route>
             </Switch>
         </Router>
