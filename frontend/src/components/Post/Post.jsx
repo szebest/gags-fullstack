@@ -113,7 +113,7 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
             </div>
             <Link to={sectionURL === undefined ? `/post/${_id}` : `/section/${sectionURL}/post/${_id}`} onClick={handleClick}>
                 <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
-                    <img onLoad={() => setLoaded(true)} style={{height: imageRef.current ? imageRef.current.naturalHeight + "px" : "inherit"}} src={imgSrc} className={classes.image} />
+                    <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={imgSrc} className={classes.image} />
                 </div>
             </Link>
             <div className={classes.statistics}>

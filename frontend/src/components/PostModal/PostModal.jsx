@@ -6,6 +6,8 @@ import axios from 'axios'
 import { useParams, Link } from 'react-router-dom'
 import { Scrollbars } from 'react-custom-scrollbars'
 import Cookies from 'js-cookie'
+import NewComment from '../NewComment/NewComment'
+import Comment from '../Comment/Comment'
 
 export default function PostModal() {
     const { sectionName } = useParams()
@@ -13,11 +15,8 @@ export default function PostModal() {
 
     const [post, setPost] = useState(null)
 
-    const [disabledBtn, setDisabledBtn] = useState(false)
-    const commentRef = useRef(null)
-
     useEffect(() => {
-        if (postID === undefined) return
+        if (!postID) return
         axios({
             method: "GET",
             url: `http://localhost:3001/posts/${postID}`,
@@ -40,10 +39,9 @@ export default function PostModal() {
         }
     })
 
-    function sendComment() {
-        setDisabledBtn(true)
+    function sendComment(comment, parentComment) {
         axios.post(`http://localhost:3001/posts/${postID}/comment`, {
-            comment: commentRef.current.value
+            comment
         }, 
         {
             headers: {
@@ -53,13 +51,10 @@ export default function PostModal() {
         .then(res => {
             const tmpPost = post
             tmpPost.comments = [res.data.comment, ...tmpPost.comments]
-            setPost(tmpPost)
+            setPost({...tmpPost})
         })
         .catch(err => {
             console.log(err)
-        })
-        .finally(() => {
-            setDisabledBtn(false)
         })
     }
 
@@ -68,7 +63,7 @@ export default function PostModal() {
         .then(res => {
             const tmpPost = post
             tmpPost.comments = res.data.comments
-            setPost(tmpPost)
+            setPost({...tmpPost})
         })
         .catch(err => {
             console.log(err)
@@ -97,44 +92,12 @@ export default function PostModal() {
                         alreadyLiked={post.actionType}
                         sectionURL={sectionName}
                     />
-                    <div className={classes.newComment}>
-                        <textarea ref={commentRef} />
-                        <button disabled={disabledBtn} onClick={sendComment}>Comment</button>
+                    <NewComment sendComment={sendComment} parentComment={null}>
                         <button onClick={refreshComments}>Refresh comment section</button>
-                    </div>
+                    </NewComment>
                     <div className={classes.container}>
                         <div className={classes.commentWrapper}>
-                            {post.comments.map((comment, index) => {
-                                return (<div className={classes.commentSplit}>
-                                    <div 
-                                        key={comment._id}
-                                        className={`${classes.commentContainer} ${index === 0 ? `${classes.fadeIn} ${classes.dur1s}` : ``}`}
-                                    >
-                                        <div className={classes.profilePictureHolder}>
-                                            <img alt="avatar" width="28" height="28" src="https://drive.google.com/uc?id=1pbqFiCHy1D2SEvnIS-r50qBG5mL0enlK"/>
-                                        </div>
-                                        <div className={classes.contentHolder}>
-                                            <div className={classes.author}>
-                                                <a target="_blank" href={`/profile/${comment.author}`}>{comment.author}</a>
-                                            </div>
-                                            <div className={classes.comment}>{comment.comment}</div>
-                                        </div>
-                                    </div>
-                                    <div className={classes.commentControl}>
-                                        <div className={`${classes.controlContainer} ${classes.hoverBackground}`}>
-                                            <p>▲</p>
-                                            <p>{comment.likes}</p>
-                                        </div>
-                                        <div className={`${classes.controlContainer} ${classes.hoverBackground}`}>
-                                            <p>▼</p>
-                                            <p>{comment.dislikes}</p>
-                                        </div>
-                                        <div className={`${classes.controlContainer} ${classes.hoverBackground}`}>
-                                            <p>Reply</p>
-                                        </div>
-                                    </div>
-                                </div>)
-                            })}
+                            {post.comments.map((comment, index) => <Comment comment={comment} sendComment={sendComment} />)}
                         </div>
                     </div>
                 </Scrollbars>

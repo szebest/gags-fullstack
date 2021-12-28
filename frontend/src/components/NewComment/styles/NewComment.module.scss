@@ -1,0 +1,20 @@
+.newComment {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+
+    > textarea {
+        align-self: center;
+        resize: vertical;
+        width: 90%;
+        min-height: 75px;
+        max-height: 300px;
+    }
+
+    > button {
+        align-self: center;
+        width: 90%;
+    }
+}

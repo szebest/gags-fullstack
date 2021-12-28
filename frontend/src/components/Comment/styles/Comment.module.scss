@@ -1,0 +1,66 @@
+.commentSplit {
+    display: flex;
+    flex-direction: column;
+    outline: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.commentContainer {
+    display: grid;
+    grid-template-columns: 30px auto;
+    padding: 5px 0 5px 0;
+}
+
+.profilePictureHolder {
+    padding-left: 5px;
+    img {
+        border-radius: 50%;
+    }
+}
+
+.contentHolder {
+    padding-left: 10px;
+}
+
+.author {
+
+    a {
+        color: inherit;
+        text-decoration: inherit;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.comment {
+    
+}
+
+.commentControl {
+    display: flex;
+    flex-direction: row;
+    padding-left: 7px;
+    padding-bottom: 5px;
+}
+
+.controlContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 50px;
+    height: 30px;
+    align-items: center;
+
+    p {
+        margin: 0px;
+    }
+}
+
+.hoverBackground {
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(150, 150, 150, 0.5);
+    }
+}
