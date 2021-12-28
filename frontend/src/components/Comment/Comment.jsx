@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react'
 import NewComment from '../NewComment/NewComment'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useSelector } from 'react-redux'
 
 export default function Comment({postID, comment, sendComment, updateThisComment, index}) {
     const [openReply, setOpenReply] = useState(false)
@@ -12,6 +13,8 @@ export default function Comment({postID, comment, sendComment, updateThisComment
     })
     const [tmpAction, tmpSetAction] = useState(action)
     const [avatar, setAvatar] = useState(null)
+
+    const hasAccess = useSelector(state => state.hasAccess)
 
     useEffect(() => {
         if (!comment) return
@@ -59,15 +62,18 @@ export default function Comment({postID, comment, sendComment, updateThisComment
     }
 
     function like() {
+        if (!hasAccess) return
+
         const tmpState = action
         tmpState.dislike = 0
         tmpState.like = tmpState.like === 0 ? 1 : 0
-
 
         setAction({...tmpState})
     }
 
     function dislike() {
+        if (!hasAccess) return
+        
         const tmpState = action
         tmpState.like = 0
         tmpState.dislike = tmpState.dislike === 0 ? 1 : 0
