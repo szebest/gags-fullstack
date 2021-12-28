@@ -252,6 +252,20 @@ app.get('/user/:accessToken', (req, res) => {
     })
 })
 
+app.get('/user/avatar/:username', async (req, res) => {
+    const username = req.params.username
+
+    try {
+        const foundUser = (await User.find({ username }).lean())[0]
+
+        return res.status(200).send({imgSrc: foundUser.imgSrc})
+    }
+    catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
+})
+
 app.get('/posts', async (req, res) => {
     const firstPost = parseInt(req.query.postNumber)
     const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
@@ -303,18 +317,18 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
         const found = await Posts.findById(postID).lean()
 
         found.comments = found.comments ?? []
-        const commentsLength = found.comments.length
-        found.comments.push({})
-        found.comments[commentsLength].postID = postID
-        parentCommentID ? found.comments[commentsLength].parentCommentId = parentCommentID : ""
-        found.comments[commentsLength].author = username
-        found.comments[commentsLength].comment = comment
-        found.comments[commentsLength].likes = 0
-        found.comments[commentsLength].dislikes = 0
+        found.comments.unshift({})
+        found.comments[0].postID = postID
+        //TODO: add children comments to the parent comment
+        parentCommentID ? found.comments[0].parentCommentId = parentCommentID : ""
+        found.comments[0].author = username
+        found.comments[0].comment = comment
+        found.comments[0].likes = 0
+        found.comments[0].dislikes = 0
 
         await Posts.findByIdAndUpdate(postID, found)
 
-        return res.status(200).send({ post: found })
+        return res.status(200).send({ post: found, comment: found.comments[0] })
     }
     catch(err) {
         return res.sendStatus(400)
@@ -328,6 +342,19 @@ app.get('/posts/:id', async (req, res) => {
         const found = await Posts.findById(postID)
 
         return res.status(200).json({ post: found })
+    }
+    catch(err) {
+        return res.sendStatus(400)
+    }
+})
+
+app.get('/posts/:id/comment', async (req, res) => {
+    const postID = req.params.id
+
+    try {
+        const found = await Posts.findById(postID)
+
+        return res.status(200).json({ comments: found.comments })
     }
     catch(err) {
         return res.sendStatus(400)
