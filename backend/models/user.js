@@ -16,6 +16,22 @@ const userPostsLikeRelationSchema = new mongoose.Schema({
     }
 })
 
+const userCommentsLikeRelationSchema = new mongoose.Schema({
+    commentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    actionType: {
+        type: String,
+        required: true
+    },
+    timestamp: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+})
+
 const userNotification = new mongoose.Schema({
     refId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -74,6 +90,7 @@ const userSchema = new mongoose.Schema({
         default: "path"
     },
     postsLiked: [userPostsLikeRelationSchema],
+    commentsLiked: [userCommentsLikeRelationSchema],
     postsCreated: [userPostsCreateRelationSchema],
     notifications: [userNotification]
 })

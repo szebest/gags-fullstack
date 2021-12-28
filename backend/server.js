@@ -335,11 +335,96 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
     }
 })
 
+app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, res) => {
+    const postID = req.params.postID
+    const commentID = req.params.commentID
+    const like = parseInt(req.body.like) || 0
+    const dislike = parseInt(req.body.dislike) || 0
+    const username = req.username
+
+    if (((like === 1 && dislike === 1) || (like === -1 && dislike === -1))) return res.sendStatus(400)
+
+    try {
+        const foundPost = await Posts.findById(postID).lean()
+
+        const foundUser = (await User.find({ username }).lean())[0]
+
+        const foundCommentIndex = foundPost.comments.findIndex(comment => {
+            return comment._id.toString() === mongoose.Types.ObjectId(commentID).toString()
+        })
+
+        const foundAlreadyLikedCommentIndex = foundUser.commentsLiked.findIndex((commentLiked) => {
+            return commentLiked.commentId.toString() === foundPost.comments[foundCommentIndex]._id.toString()
+        })
+
+        if (foundAlreadyLikedCommentIndex !== -1) {
+            const actionDid = foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType
+
+            if (actionDid === 'like' && like === -1) {
+                foundPost.comments[foundCommentIndex].likes += like
+                if (dislike === 0) foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'none'
+                else if (dislike === 1) {
+                    foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'dislike'
+                    foundPost.comments[foundCommentIndex].dislikes += dislike
+                }
+            }
+            
+            if (actionDid === 'dislike' && dislike === -1) {
+                foundPost.comments[foundCommentIndex].dislikes += dislike
+                if (like === 0) foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'none'
+                else if (like === 1) {
+                    foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'like'
+                    foundPost.comments[foundCommentIndex].likes += like
+                }
+            }
+
+            if (actionDid === 'none' && like === 1 && dislike === 0) {
+                foundPost.comments[foundCommentIndex].likes += like
+                foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'like'
+            }
+
+            if (actionDid === 'none' && dislike === 1 && like === 0) {
+                foundPost.comments[foundCommentIndex].dislikes += dislike
+                foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'dislike'
+            }
+        }
+        else {
+            foundPost.comments[foundCommentIndex].likes += like 
+            foundPost.comments[foundCommentIndex].dislikes += dislike
+        }
+
+        const foundCommentLiked = foundUser.commentsLiked.find(commentLiked => {
+            return commentLiked._id.toString() === mongoose.Types.ObjectId(commentID).toString()
+        })
+
+        if (foundCommentLiked && ((like === 1 && foundCommentLiked.actionType === 'like') ||
+            (dislike === 1 && foundCommentLiked.actionType === 'dislike'))) return res.sendStatus(400)
+
+        foundUser.commentsLiked.unshift({})
+
+        foundUser.commentsLiked[0].commentId = foundPost.comments[foundCommentIndex]._id
+
+        foundUser.commentsLiked[0].actionType = like === 1 ? 'like' :
+                                                    (dislike === 1 ? 'dislike' : 'none')
+
+        const updatedPost = await Posts.findByIdAndUpdate(postID, foundPost, {new: true})
+
+        const updatedUser = await User.findOneAndUpdate({username}, foundUser, {new: true})
+
+        return res.status(200).send({post: updatedPost, updatedComment: foundPost.comments[foundCommentIndex], updatedUser})
+    }
+    catch(err) {
+        return res.sendStatus(400)
+    }
+})
+
 app.get('/posts/:id', async (req, res) => {
     const postID = req.params.id
 
     try {
-        const found = await Posts.findById(postID)
+        const found = await Posts.findById(postID).lean()
+
+        delete found.comments
 
         return res.status(200).json({ post: found })
     }
@@ -348,11 +433,25 @@ app.get('/posts/:id', async (req, res) => {
     }
 })
 
-app.get('/posts/:id/comment', async (req, res) => {
+app.get('/posts/:id/comment', checkToken, async (req, res) => {
     const postID = req.params.id
+    const username = req.username
 
     try {
-        const found = await Posts.findById(postID)
+        const found = await Posts.findById(postID).lean()
+        if (username) {
+            const foundUser = await User.findOne({username})
+
+            found.comments.map((comment) => {
+                const foundIndex = foundUser.commentsLiked.findIndex((commentLiked) => {
+                    return commentLiked.commentId.toString() === comment._id.toString()
+                })
+                if (foundIndex !== -1) {
+                    comment.actionType = foundUser.commentsLiked[foundIndex].actionType
+                }
+                return comment
+            })
+        }
 
         return res.status(200).json({ comments: found.comments })
     }
@@ -421,8 +520,6 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
 
             if (like > 0 && notificationMessage !== '' && postAuthor !== '') {
                 const foundAuthor = (await User.find({ postAuthor }))[0]
-                console.log(foundAuthor.username)
-                console.log(postAuthor)
                 foundAuthor.notifications.unshift({})
                 foundAuthor.notifications[0].message = notificationMessage
                 foundAuthor.notifications[0].refId = postObjectID
@@ -449,15 +546,30 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const authToken = authHeader && authHeader.split(' ')[1]
 
-    if (authToken === null)
-        return res.sendStatus(401)
+    if (authToken === null) return res.sendStatus(401)
     else {
         jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            if (err)
-                return res.sendStatus(403)
+            if (err) return res.sendStatus(403)
             
             req.username = user.username
             next()
+        })
+    }
+}
+
+function checkToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const authToken = authHeader && authHeader.split(' ')[1]
+
+    if (authToken === null)
+        next()
+    else {
+        jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+            if (err) next()
+            else {
+                req.username = user.username
+                next()
+            }
         })
     }
 }
