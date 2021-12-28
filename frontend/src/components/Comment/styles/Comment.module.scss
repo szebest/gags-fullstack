@@ -64,3 +64,16 @@
         background-color: rgba(150, 150, 150, 0.5);
     }
 }
+
+.activeLike {
+    background-color: rgba(0 119 255 / .06) !important;
+    border-color: rgba(0 119 255 / .1);
+    
+    p {
+        color: #07f;
+    }
+
+    &:hover {
+        background-color: rgba(0 119 255 / .25) !important;
+    }
+}

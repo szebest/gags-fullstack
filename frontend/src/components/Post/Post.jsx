@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 
-function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked, sectionURL }) {
+function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked }) {
     const [loaded, setLoaded] = useState(false)
     const [likesState, setLikesState] = useState(likes)
     const [dislikesState, setDisLikesState] = useState(dislikes)
@@ -14,6 +14,8 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
     const [actionDisLike, setActionDisLike] = useState('none')
     const hasAccess = useSelector(state => state.hasAccess)
     const imageRef = useRef()
+
+    const { sectionName } = useParams()
 
     const handleClick = () => {
         localStorage.setItem('scrollY', window.scrollY)
@@ -111,7 +113,7 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
             <div className={classes.center}>
                 <h6>Posted in {section} by {author}</h6>
             </div>
-            <Link to={sectionURL === undefined ? `/post/${_id}` : `/section/${sectionURL}/post/${_id}`} onClick={handleClick}>
+            <Link to={sectionName === undefined ? `/post/${_id}` : `/section/${sectionName}/post/${_id}`} onClick={handleClick}>
                 <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
                     <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={imgSrc} className={classes.image} />
                 </div>

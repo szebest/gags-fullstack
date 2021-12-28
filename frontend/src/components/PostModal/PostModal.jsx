@@ -15,6 +15,36 @@ export default function PostModal() {
 
     const [post, setPost] = useState(null)
 
+    function refreshComments() {
+        console.log("refreshComments")
+        axios.get(`http://localhost:3001/posts/${postID}/comment`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+        .then(res => {
+            console.log(res.data.comments)
+            const tmpPost = post
+            tmpPost.comments = res.data.comments
+            setPost({...tmpPost})
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+    function updateComment(updatedComment, index) {
+        const tmpPost = post
+        tmpPost.comments[index] = updatedComment
+        setPost({...tmpPost})
+    }
+
+    useEffect(() => {
+        if (!post || post.comments) return
+
+        refreshComments()
+    }, [post])
+
     useEffect(() => {
         if (!postID) return
         axios({
@@ -37,7 +67,7 @@ export default function PostModal() {
             document.body.classList.remove("modal-open")
             document.getElementsByTagName('html')[0].classList.remove("modal-open")
         }
-    })
+    }, [])
 
     function sendComment(comment, parentComment) {
         axios.post(`http://localhost:3001/posts/${postID}/comment`, {
@@ -51,18 +81,6 @@ export default function PostModal() {
         .then(res => {
             const tmpPost = post
             tmpPost.comments = [res.data.comment, ...tmpPost.comments]
-            setPost({...tmpPost})
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    }
-
-    function refreshComments() {
-        axios.get(`http://localhost:3001/posts/${postID}/comment`)
-        .then(res => {
-            const tmpPost = post
-            tmpPost.comments = res.data.comments
             setPost({...tmpPost})
         })
         .catch(err => {
@@ -97,7 +115,7 @@ export default function PostModal() {
                     </NewComment>
                     <div className={classes.container}>
                         <div className={classes.commentWrapper}>
-                            {post.comments.map((comment, index) => <Comment comment={comment} sendComment={sendComment} />)}
+                            {post.comments && post.comments.map((comment, index) => <Comment updateThisComment={updateComment} postID={postID} comment={comment} sendComment={sendComment} index={index} key={comment._id} />)}
                         </div>
                     </div>
                 </Scrollbars>
