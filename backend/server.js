@@ -326,9 +326,9 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
         found.comments[0].likes = 0
         found.comments[0].dislikes = 0
 
-        await Posts.findByIdAndUpdate(postID, found)
+        const updatedPost = await Posts.findByIdAndUpdate(postID, found, {new: true})
 
-        return res.status(200).send({ post: found, comment: found.comments[0] })
+        return res.status(200).send({ comment: updatedPost.comments[0] })
     }
     catch(err) {
         return res.sendStatus(400)
