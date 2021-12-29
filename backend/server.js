@@ -418,11 +418,22 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
     }
 })
 
-app.get('/posts/:id', async (req, res) => {
+app.get('/posts/:id', checkToken, async (req, res) => {
     const postID = req.params.id
+    const username = req.username
 
     try {
         const found = await Posts.findById(postID).lean()
+
+        if (username !== undefined) {
+            const foundUser = await User.findOne({ username })
+
+            const foundUserIndex = foundUser.postsLiked.findIndex((postLiked) => {
+                return postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
+            })
+
+            if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType 
+        }
 
         delete found.comments
 
