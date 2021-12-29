@@ -16,7 +16,6 @@ export default function PostModal() {
     const [post, setPost] = useState(null)
 
     function refreshComments() {
-        console.log("refreshComments")
         axios.get(`http://localhost:3001/posts/${postID}/comment`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
@@ -50,6 +49,9 @@ export default function PostModal() {
         axios({
             method: "GET",
             url: `http://localhost:3001/posts/${postID}`,
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
         })
         .then(res => {
             setPost(res.data.post)
@@ -109,6 +111,7 @@ export default function PostModal() {
                         dislikes={post.dislikes}
                         alreadyLiked={post.actionType}
                         sectionURL={sectionName}
+                        saveInLS={true}
                     />
                     <NewComment sendComment={sendComment} parentComment={null}>
                         <button onClick={refreshComments}>Refresh comment section</button>

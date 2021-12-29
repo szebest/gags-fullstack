@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
 
-function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked }) {
+function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLiked, saveInLS }) {
     const [loaded, setLoaded] = useState(false)
     const [likesState, setLikesState] = useState(likes)
     const [dislikesState, setDisLikesState] = useState(dislikes)
@@ -50,12 +50,31 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
             })
             .catch(err => {
                 console.error(err)
-                //setButtonClicked(null)
-                //setLikesState(prev => prev - sendLikes)
-                //setDisLikesState(prev => prev - sendDisLikes)
             })
         }
     }, [likesState, dislikesState])
+
+    console.log(buttonClicked)
+
+    if (saveInLS === undefined) {
+        const saved = localStorage.getItem('postAction')
+
+        if (saved !== null) {
+            const obj = JSON.parse(saved)
+            if (obj.postId.toString() === _id.toString()) {
+                const action = obj.actionType
+                setButtonClicked(action)
+                if (action === 'like') setActionLike(action)
+                else if (action === 'dislike') setActionDisLike(action)
+                else {
+                    setActionDisLike(action)
+                    setActionLike(action)
+                }
+
+                localStorage.removeItem('postAction')
+            }
+        }
+    }
 
     const handleButtonClick = which => {
         if (!hasAccess) return
@@ -65,6 +84,11 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
                 setLikesState(prev => prev - 1)
                 setActionLike('remove')
                 setActionDisLike('none')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'none'
+                }))
+
             }
             else if (buttonClicked) {
                 setButtonClicked(which)
@@ -72,12 +96,20 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
                 setDisLikesState(prev => prev - 1)
                 setActionLike('add')
                 setActionDisLike('remove')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'like'
+                }))
             }
             else {
                 setButtonClicked(which)
                 setLikesState(prev => prev + 1)
                 setActionLike('add')
                 setActionDisLike('none')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'like'
+                }))
             }
         }
         else {
@@ -86,6 +118,10 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
                 setDisLikesState(prev => prev - 1)
                 setActionDisLike('remove')
                 setActionLike('none')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'none'
+                }))
             }
             else if (buttonClicked) {
                 setButtonClicked(which)
@@ -93,12 +129,20 @@ function Post({ _id, title, author, section, imgSrc, likes, dislikes, alreadyLik
                 setLikesState(prev => prev - 1)
                 setActionDisLike('add')
                 setActionLike('remove')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'dislike'
+                }))
             }
             else {
                 setButtonClicked(which)
                 setDisLikesState(prev => prev + 1)
                 setActionDisLike('add')
                 setActionLike('none')
+                localStorage.setItem('postAction', JSON.stringify({
+                    postId: _id,
+                    actionType: 'dislike'
+                }))
             }
         }
     }
