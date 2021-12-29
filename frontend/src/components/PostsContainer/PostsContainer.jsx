@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
 
-function PostsContainer({posts, callForMore, sectionName, ready}) {
+function PostsContainer({posts, callForMore, sectionName, ready, updatePost}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
 
@@ -14,17 +14,12 @@ function PostsContainer({posts, callForMore, sectionName, ready}) {
 
     return (
         <div className={classes.limitSpace}>
-            {posts.map((post) => {
+            {posts.map((post, index) => {
                 return <Post 
-                    _id={post._id}
-                    key={post._id} 
-                    title={post.title}
-                    author={post.author}
-                    section={post.section}
-                    imgSrc={post.imgSrc} 
-                    likes={post.likes} 
-                    dislikes={post.dislikes}
-                    alreadyLiked={post.actionType}
+                    key={post._id}
+                    post={post}
+                    updatePost={updatePost}
+                    index={index}
                     sectionURL={sectionName}
                     />
             }

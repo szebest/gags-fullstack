@@ -10,6 +10,12 @@ function PostsContainerAPI({ sectionName }) {
     const [postsAvailable, setPostsAvailable] = useState(true)
     const [posts, setPosts] = useState([])
 
+    function updatePost(updatedPost, index) {
+        const tmpPosts = posts
+        tmpPosts[index] = updatedPost
+        setPosts([...tmpPosts])
+    }
+
     const sendRequest = () => {
         if (!postsAvailable) return
 
@@ -41,7 +47,7 @@ function PostsContainerAPI({ sectionName }) {
 
     return (
         <div className={classes.postsContainerWrapper}>
-            <PostsContainer posts={posts} callForMore={sendRequest} sectionName={postsAvailable ? sectionName : ""} />
+            <PostsContainer updatePost={updatePost} posts={posts} callForMore={sendRequest} sectionName={postsAvailable ? sectionName : ""} />
         </div>
     );
 }

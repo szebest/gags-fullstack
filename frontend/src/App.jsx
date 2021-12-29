@@ -113,13 +113,13 @@ function App() {
                 <Route exact path="/profile/:profileName">
                     <ProfileSite />
                 </Route>
-                <Route path="/post/:postID">
+                <Route exact path="/post/:postID">
                     <MainSite />
-                    <PostModal></PostModal>
+                    <PostModal />
                 </Route>
-                <Route path="/section/:sectionName/post/:postID">
+                <Route exact path="/section/:sectionName/post/:postID">
                     <MainSite />
-                    <PostModal></PostModal>
+                    <PostModal />
                 </Route>
             </Switch>
         </Router>

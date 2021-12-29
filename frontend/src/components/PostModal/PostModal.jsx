@@ -15,6 +15,10 @@ export default function PostModal() {
 
     const [post, setPost] = useState(null)
 
+    function updatePost(updatedPost, index) {
+        setPost({...updatedPost})
+    }
+
     function refreshComments() {
         axios.get(`http://localhost:3001/posts/${postID}/comment`, {
             headers: {
@@ -22,7 +26,6 @@ export default function PostModal() {
             }
         })
         .then(res => {
-            console.log(res.data.comments)
             const tmpPost = post
             tmpPost.comments = res.data.comments
             setPost({...tmpPost})
@@ -101,16 +104,10 @@ export default function PostModal() {
                     autoHideTimeout={500}
                     autoHideDuration={200}>
                     <Post
-                        _id={post._id}
                         key={post._id}
-                        title={post.title}
-                        author={post.author}
-                        section={post.section}
-                        imgSrc={post.imgSrc}
-                        likes={post.likes}
-                        dislikes={post.dislikes}
-                        alreadyLiked={post.actionType}
-                        sectionURL={sectionName}
+                        post={post}
+                        updatePost={updatePost}
+                        index={0}
                         saveInLS={true}
                     />
                     <NewComment sendComment={sendComment} parentComment={null}>
