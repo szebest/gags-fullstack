@@ -393,25 +393,25 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
             foundPost.comments[foundCommentIndex].dislikes += dislike
         }
 
-        const foundCommentLiked = foundUser.commentsLiked.find(commentLiked => {
-            return commentLiked._id.toString() === mongoose.Types.ObjectId(commentID).toString()
+        let foundCommentLikedIndex = foundUser.commentsLiked.findIndex(commentLiked => {
+            return commentLiked.commentId.toString() === mongoose.Types.ObjectId(commentID).toString()
         })
 
-        if (foundCommentLiked && ((like === 1 && foundCommentLiked.actionType === 'like') ||
-            (dislike === 1 && foundCommentLiked.actionType === 'dislike'))) return res.sendStatus(400)
+        if (foundCommentLikedIndex < 0) {
+            foundUser.commentsLiked.unshift({})
+            foundCommentLikedIndex = 0
 
-        foundUser.commentsLiked.unshift({})
+            foundUser.commentsLiked[foundCommentLikedIndex].commentId = foundPost.comments[foundCommentIndex]._id
+        }
 
-        foundUser.commentsLiked[0].commentId = foundPost.comments[foundCommentIndex]._id
-
-        foundUser.commentsLiked[0].actionType = like === 1 ? 'like' :
+        foundUser.commentsLiked[foundCommentLikedIndex].actionType = like === 1 ? 'like' :
                                                     (dislike === 1 ? 'dislike' : 'none')
 
-        const updatedPost = await Posts.findByIdAndUpdate(postID, foundPost, {new: true})
+        await Posts.findByIdAndUpdate(postID, foundPost)
 
-        const updatedUser = await User.findOneAndUpdate({username}, foundUser, {new: true})
+        await User.findOneAndUpdate({username}, foundUser)
 
-        return res.status(200).send({post: updatedPost, updatedComment: foundPost.comments[foundCommentIndex], updatedUser})
+        return res.status(200).send({ updatedComment: foundPost.comments[foundCommentIndex] })
     }
     catch(err) {
         return res.sendStatus(400)
