@@ -17,7 +17,7 @@ const upload = multer({
 const sharp = require('sharp')
 const { uploadFile } = require('./gcs')
 const dnsPrefetchControl = require('dns-prefetch-control')
-const { syncIndexes } = require('./models/user')
+const { syncIndexes, findOneAndUpdate } = require('./models/user')
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URL)
 
@@ -82,6 +82,7 @@ app.post('/login', async (req, res) => {
         }
     }
     catch (err) {
+        console.log(err)
         res.status(500).json({ message: err.message})
     }
 })
@@ -95,6 +96,7 @@ app.post('/logout', async (req, res) => {
         res.status(200).json({ deletedCount: removed.deletedCount })
     }
     catch (err) {
+        console.log(err)
         res.status(500).json({ message: err })
     }
 })
@@ -121,6 +123,7 @@ app.post('/refresh', async (req, res) => {
         }
     }
     catch (err) {
+        console.log(err)
         return res.sendStatus(403)
     }
 })
@@ -138,14 +141,11 @@ app.post('/register', upload.single("file"), async (req, res) => {
 
     try {
         const users = await User.find({username})
-        if (users.length > 0) {
-            res.status(409).json({ message: "A user with this login already exists"})
-            return
-        }
+        if (users.length > 0) return res.status(409).json({ message: "A user with this login already exists"})
     }
     catch (err) {
-        res.status(500).json({ message: err.message})
-        return
+        console.log(err)
+        return res.status(500).json({ message: err.message})
     }
     
     const user = new User({
@@ -162,6 +162,7 @@ app.post('/register', upload.single("file"), async (req, res) => {
         return res.status(201).json(newUser)
     }
     catch (err) {
+        console.log(err)
         return res.status(400).json({ message: err.message})
     }
 })
@@ -203,6 +204,7 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
         return res.status(201).json(newPost)
     }
     catch (err) {
+        console.log(err)
         return res.status(400).json({ message: err.message })
     }
 })
@@ -287,7 +289,7 @@ app.get('/posts', async (req, res) => {
 
         userLikedPosts.forEach((likedPost) => {
             slicedPosts.forEach((post, index) => {
-                if (likedPost.postId.toString() === post._id.toString())
+                if (likedPost.postId && likedPost.postId.toString() === post._id.toString())
                     slicedPosts[index].actionType = likedPost.actionType
 
                 let {comments, ...slicedPostWithoutComments} = slicedPosts[index]
@@ -331,6 +333,7 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
         return res.status(200).send({ comment: updatedPost.comments[0] })
     }
     catch(err) {
+        console.log(err)
         return res.sendStatus(400)
     }
 })
@@ -353,7 +356,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
             return comment._id.toString() === mongoose.Types.ObjectId(commentID).toString()
         })
 
-        const foundAlreadyLikedCommentIndex = foundUser.commentsLiked.findIndex((commentLiked) => {
+        let foundAlreadyLikedCommentIndex = foundUser.commentsLiked.findIndex((commentLiked) => {
             return commentLiked.commentId.toString() === foundPost.comments[foundCommentIndex]._id.toString()
         })
 
@@ -393,18 +396,14 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
             foundPost.comments[foundCommentIndex].dislikes += dislike
         }
 
-        let foundCommentLikedIndex = foundUser.commentsLiked.findIndex(commentLiked => {
-            return commentLiked.commentId.toString() === mongoose.Types.ObjectId(commentID).toString()
-        })
-
-        if (foundCommentLikedIndex < 0) {
+        if (foundAlreadyLikedCommentIndex < 0) {
             foundUser.commentsLiked.unshift({})
-            foundCommentLikedIndex = 0
+            foundAlreadyLikedCommentIndex = 0
 
-            foundUser.commentsLiked[foundCommentLikedIndex].commentId = foundPost.comments[foundCommentIndex]._id
+            foundUser.commentsLiked[foundAlreadyLikedCommentIndex].commentId = foundPost.comments[foundCommentIndex]._id
         }
 
-        foundUser.commentsLiked[foundCommentLikedIndex].actionType = like === 1 ? 'like' :
+        foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = like === 1 ? 'like' :
                                                     (dislike === 1 ? 'dislike' : 'none')
 
         await Posts.findByIdAndUpdate(postID, foundPost)
@@ -414,6 +413,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
         return res.status(200).send({ updatedComment: foundPost.comments[foundCommentIndex] })
     }
     catch(err) {
+        console.log(err)
         return res.sendStatus(400)
     }
 })
@@ -429,7 +429,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
             const foundUser = await User.findOne({ username })
 
             const foundUserIndex = foundUser.postsLiked.findIndex((postLiked) => {
-                return postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
+                return postLiked.postId && postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
             })
 
             if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType 
@@ -440,6 +440,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
         return res.status(200).json({ post: found })
     }
     catch(err) {
+        console.log(err)
         return res.sendStatus(400)
     }
 })
@@ -467,89 +468,115 @@ app.get('/posts/:id/comment', checkToken, async (req, res) => {
         return res.status(200).json({ comments: found.comments })
     }
     catch(err) {
+        console.log(err)
         return res.sendStatus(400)
     }
 })
 
 app.patch('/posts/:id', authenticateToken, async (req, res) => {
     const postObjectID = req.params.id
-    const like = parseInt(req.query.like) || 0
-    const dislike = parseInt(req.query.dislike) || 0
+    const like = parseInt(req.body.like) || 0
+    const dislike = parseInt(req.body.dislike) || 0
     const username = req.username
 
-    if (like || dislike) {
-        try {
-            let notificationMessage = ''
-            let socketObject
-            let postAuthor = ''
-            const foundPosts = [await Posts.findById(postObjectID)]
-            foundPosts.forEach(async (post) => {
-                postAuthor = post.author
-                const foundMilestoneIndex = postLikeMilestones.findIndex(milestone => 
-                    milestone === post.likes + like && milestone === post.nextLikeMilestone)
-                const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
-                if (foundMilestoneIndex > -1) {
-                    notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} ${postLikeMilestones[foundMilestoneIndex] === 1 ? 'like' : 'likes'} 👍`
-                    socketObject = connectedUserSockets.find(obj => obj.username === post.author)
-                }
-                await Posts.updateOne(post, {$set: {
-                    likes: post.likes + like,
-                    dislikes: post.dislikes + dislike,
-                    nextLikeMilestone: foundMilestoneIndex > -1 ? 
-                                        (nextMilestoneExists ? 
-                                            postLikeMilestones[foundMilestoneIndex + 1] 
-                                            : -1) 
-                                        : post.nextLikeMilestone
-                }})
-            })
+    if (((like === 1 && dislike === 1) || (like === -1 && dislike === -1))) return res.sendStatus(400)
 
-            const foundUser = (await User.find({ username }))[0]
-            let foundIndex = -1
-            const exists = foundUser.postsLiked.some((postLiked, index) => {
-                if (postLiked.postId.toString() === mongoose.Types.ObjectId(postObjectID).toString()) {
-                    foundIndex = index
-                    return true
-                }
-                return false
-            })
+    try {
+        let notificationMessage = ''
+        let socketObject
+        let postAuthor = ''
+        const foundPost = await Posts.findById(postObjectID).lean()
 
-            //aktualizacja albo dodanie nowe
-            if (like > 0 || dislike > 0) {
-                if (exists) {
-                    foundUser.postsLiked[foundIndex].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
-                    foundUser.postsLiked[foundIndex].timestamp = Date.now
-                }
-                else {
-                    foundUser.postsLiked.unshift({})
-                    foundUser.postsLiked[0].postId = postObjectID
-                    foundUser.postsLiked[0].actionType = like === 1 ? 'like' : (dislike === 1 ? 'dislike' : 'none')
+        postAuthor = foundPost.author
+        const foundMilestoneIndex = postLikeMilestones.findIndex(milestone =>
+            milestone === foundPost.likes + like && milestone === foundPost.nextLikeMilestone)
+        const nextMilestoneExists = foundMilestoneIndex >= -1 ? (foundMilestoneIndex + 1 < postLikeMilestones.length) : false
+        if (foundMilestoneIndex > -1) {
+            notificationMessage = `your post has received ${postLikeMilestones[foundMilestoneIndex]} ${postLikeMilestones[foundMilestoneIndex] === 1 ? 'like' : 'likes'} 👍`
+            socketObject = connectedUserSockets.find(obj => obj.username === foundPost.author)
+        }
+
+        const foundUser = await User.findOne({ username }).lean()
+
+        /////////////////////////////
+
+        let foundAlreadyLikedPostIndex = foundUser.postsLiked.findIndex((postLiked) => {
+            return postLiked.postId.toString() === foundPost._id.toString()
+        })
+
+        if (foundAlreadyLikedPostIndex !== -1) {
+            const actionDid = foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType
+
+            if (actionDid === 'like' && like === -1) {
+                foundPost.likes += like
+                if (dislike === 0) foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'none'
+                else if (dislike === 1) {
+                    foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'dislike'
+                    foundPost.dislikes += dislike
                 }
             }
-            else if (exists) foundUser.postsLiked.splice(foundIndex, 1)
 
-            const updatedUser = await User.findOneAndUpdate({ username }, foundUser, {new: true})
-
-            if (like > 0 && notificationMessage !== '' && postAuthor !== '') {
-                const foundAuthor = (await User.find({ postAuthor }))[0]
-                foundAuthor.notifications.unshift({})
-                foundAuthor.notifications[0].message = notificationMessage
-                foundAuthor.notifications[0].refId = postObjectID
-                foundAuthor.notifications[0].notificationType = 'post'
-
-                await User.findOneAndUpdate({ postAuthor }, foundAuthor)
-
-                if (socketObject) socketObject.socket.emit('notification', foundAuthor.notifications[0])
+            if (actionDid === 'dislike' && dislike === -1) {
+                foundPost.dislikes += dislike
+                if (like === 0) foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'none'
+                else if (like === 1) {
+                    foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'like'
+                    foundPost.likes += like
+                }
             }
 
-            return res.sendStatus(200)
+            if (actionDid === 'none' && like === 1 && dislike === 0) {
+                foundPost.likes += like
+                foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'like'
+            }
+
+            if (actionDid === 'none' && dislike === 1 && like === 0) {
+                foundPost.dislikes += dislike
+                foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'dislike'
+            }
         }
-        catch(err) {
-            console.error(err)
-            return res.sendStatus(400)
+        else {
+            foundPost.likes += like
+            foundPost.dislikes += dislike
         }
+
+        if (foundAlreadyLikedPostIndex < 0) {
+            foundUser.postsLiked.unshift({})
+            foundAlreadyLikedPostIndex = 0
+
+            foundUser.postsLiked[foundAlreadyLikedPostIndex].postId = foundPost._id
+        }
+
+        foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = like === 1 ? 'like' :
+                                                    (dislike === 1 ? 'dislike' : 'none')
+
+        foundPost.nextLikeMilestone = foundMilestoneIndex > -1 ? 
+            (nextMilestoneExists ? postLikeMilestones[foundMilestoneIndex + 1] : -1) 
+            : foundPost.nextLikeMilestone
+
+        const updatedPost = await Posts.findByIdAndUpdate(postObjectID, foundPost, {new: true})
+
+        /////////////////////////////
+
+        await User.findOneAndUpdate({ username }, foundUser)
+
+        if (like > 0 && notificationMessage !== '' && postAuthor !== '') {
+            const foundAuthor = (await User.find({ postAuthor }))[0]
+            foundAuthor.notifications.unshift({})
+            foundAuthor.notifications[0].message = notificationMessage
+            foundAuthor.notifications[0].refId = postObjectID
+            foundAuthor.notifications[0].notificationType = 'post'
+
+            await User.findOneAndUpdate({ postAuthor }, foundAuthor)
+
+            if (socketObject) socketObject.socket.emit('notification', foundAuthor.notifications[0])
+        }
+
+        return res.status(200).json({ updatedPost: updatedPost })
     }
-    else {
-        return res.sendStatus(500)
+    catch (err) {
+        console.error(err)
+        return res.sendStatus(400)
     }
 })
 
