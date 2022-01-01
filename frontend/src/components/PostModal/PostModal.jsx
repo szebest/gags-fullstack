@@ -8,6 +8,7 @@ import { Scrollbars } from 'react-custom-scrollbars'
 import Cookies from 'js-cookie'
 import NewComment from '../NewComment/NewComment'
 import Comment from '../Comment/Comment'
+import CommentsContainer from '../CommentsContainer/CommentsContainer'
 
 export default function PostModal() {
     const { sectionName } = useParams()
@@ -117,14 +118,22 @@ export default function PostModal() {
                         index={0}
                         saveInLS={true}
                     />
-                    <NewComment sendComment={sendComment} parentComment={null}>
+                    {/*<NewComment sendComment={sendComment} parentComment={null}>
                         <button onClick={refreshComments}>Refresh comment section</button>
                     </NewComment>
-                    <div id="comments" className={classes.container}>
+                    <div className={classes.container}>
                         <div className={classes.commentWrapper}>
                             {post.comments && post.comments.map((comment, index) => <Comment updateThisComment={updateComment} postID={postID} comment={comment} sendComment={sendComment} index={index} key={comment._id} />)}
                         </div>
-                    </div>
+                    </div>*/}
+                    <CommentsContainer 
+                        comments={post.comments}
+                        sectionName={sectionName}
+                        updateComment={updateComment}
+                        sendComment={sendComment}
+                        refreshComments={refreshComments}
+                        postID={postID}
+                    />
                 </Scrollbars>
             </div>}
         </>,

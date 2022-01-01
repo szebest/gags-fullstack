@@ -151,6 +151,9 @@ function ProfileSite() {
                         <li onClick={() => setSelected(1)} className={selected === 1 ? classes.selected : null}>
                             Posts liked
                         </li>
+                        <li onClick={() => setSelected(2)} className={selected === 2 ? classes.selected : null}>
+                            Posts commented
+                        </li>
                     </ul>
                 </div>
                 <div className={classes.content}>
