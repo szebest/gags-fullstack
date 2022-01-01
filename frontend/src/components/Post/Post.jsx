@@ -16,7 +16,6 @@ function Post({ post, saveInLS, updatePost, index }) {
     const imageRef = useRef()
 
     const { sectionName } = useParams()
-
     useEffect(() => {
         if (!post._id) return
 
@@ -35,10 +34,7 @@ function Post({ post, saveInLS, updatePost, index }) {
             }
         })
         .then(res => {
-            /*if (saveInLS) localStorage.setItem('postAction', JSON.stringify({
-                postId: res.data.updatedPost._id,
-                actionType: res.data.updatedPost.actionType
-            }))*/
+            if (saveInLS) localStorage.setItem('postToBeUpdated', res.data.updatedPost._id)
 
             updatePost(res.data.updatedPost, index)
         })
@@ -47,22 +43,40 @@ function Post({ post, saveInLS, updatePost, index }) {
         })
     }, [action])
 
-    /*if (saveInLS === undefined) {
-        const saved = localStorage.getItem('postAction')
+    useEffect(() => {
+        if (!post.actionType) return
 
-        if (saved !== null) {
-            const obj = JSON.parse(saved)
-            if (obj.postId.toString() === post._id.toString()) {
-                const action = obj.actionType
-                setAction({
-                    like: action === 'like' ? 1 : 1,
-                    dislike: action === 'dislike' ? 1 : 0
+        const obj = {
+            like: post.actionType === 'like' ? 1 : 0,
+            dislike: post.actionType === 'dislike' ? 1 : 0
+        }
+
+        tmpSetAction(obj)
+        setAction(obj)
+    }, [post && post.actionType])
+
+    if (saveInLS === undefined) {
+        const postIdToBeUpdated = localStorage.getItem('postToBeUpdated')
+
+        if (postIdToBeUpdated !== null) {
+            if (postIdToBeUpdated.toString() === post._id.toString()) {
+                axios({
+                    method: "GET",
+                    url: `http://localhost:3001/posts/${post._id}`,
+                    headers: {
+                        "Authorization": `Bearer ${Cookies.get("accessToken")}`
+                    }
                 })
-
-                localStorage.removeItem('postAction')
+                .then(res => {
+                    updatePost(res.data.post, index)
+                    localStorage.removeItem('postToBeUpdated')
+                })
+                .catch(err => {
+                    console.error(err)
+                })
             }
         }
-    }*/
+    }
 
     function like() {
         if (!hasAccess) return
