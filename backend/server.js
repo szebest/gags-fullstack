@@ -154,7 +154,8 @@ app.post('/register', upload.single("file"), async (req, res) => {
         imgSrc: fileSrc,
         postsLiked: [],
         postsCreated: [],
-        notifications: []
+        notifications: [],
+        commentsLiked: []
     })
 
     try {
@@ -268,33 +269,26 @@ app.get('/user/avatar/:username', async (req, res) => {
     }
 })
 
-app.get('/posts', async (req, res) => {
+app.get('/posts', checkToken, async (req, res) => {
     const firstPost = parseInt(req.query.postNumber)
     const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
     const section = req.query.section
-    const accessToken = req.query.accessToken
-    let username = ""
-
-    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (!err)
-            username = user.username
-    })
+    const username = req.username
 
     try {
         const posts = section === 'undefined' ? await Posts.find().lean() : await Posts.find({ section }).lean()
-        const userLikedPosts = username.length > 0 ? (await User.find({ username }))[0].postsLiked : []
+        const userLikedPosts = username ? (await User.findOne({ username })).postsLiked : []
 
-        posts.reverse()
-        const slicedPosts = posts.slice(firstPost, firstPost + amountOfReturnedPosts)
-
-        userLikedPosts.forEach((likedPost) => {
-            slicedPosts.forEach((post, index) => {
-                if (likedPost.postId && likedPost.postId.toString() === post._id.toString())
-                    slicedPosts[index].actionType = likedPost.actionType
-
-                let {comments, ...slicedPostWithoutComments} = slicedPosts[index]
-                slicedPosts[index] = slicedPostWithoutComments
+        const slicedPosts = posts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts).map((slicedPost) => {
+            userLikedPosts.forEach((likedPost) => {
+                if (likedPost.postId && likedPost.postId.toString() === slicedPost._id.toString())
+                    slicedPost.actionType = likedPost.actionType
             })
+
+            slicedPost.commentsAmount = slicedPost.comments.length
+            delete slicedPost.comments
+            
+            return slicedPost
         })
 
         const numberOfPostsLeft = Math.max(posts.length - firstPost - amountOfReturnedPosts, 0)
@@ -435,6 +429,8 @@ app.get('/posts/:id', checkToken, async (req, res) => {
             if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType 
         }
 
+        found.commentsAmount = found.comments.length
+
         delete found.comments
 
         return res.status(200).json({ post: found })
@@ -554,7 +550,11 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
             (nextMilestoneExists ? postLikeMilestones[foundMilestoneIndex + 1] : -1) 
             : foundPost.nextLikeMilestone
 
-        const updatedPost = await Posts.findByIdAndUpdate(postObjectID, foundPost, {new: true})
+        const updatedPost = await Posts.findByIdAndUpdate(postObjectID, foundPost, {new: true}).lean()
+
+        updatedPost.commentsAmount = updatedPost.comments.length
+
+        delete updatedPost.comments
 
         /////////////////////////////
 
