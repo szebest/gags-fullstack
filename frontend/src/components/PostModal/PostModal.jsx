@@ -14,7 +14,7 @@ export default function PostModal() {
     const { postID } = useParams()
 
     const [post, setPost] = useState(null)
-
+    
     function updatePost(updatedPost, index) {
         setPost({...updatedPost})
     }

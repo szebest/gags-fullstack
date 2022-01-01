@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Redirect } from 'react-router-dom'
 
 function Post({ post, saveInLS, updatePost, index }) {
     const [loaded, setLoaded] = useState(false)
@@ -14,6 +14,8 @@ function Post({ post, saveInLS, updatePost, index }) {
     const [tmpAction, tmpSetAction] = useState(action)
     const hasAccess = useSelector(state => state.hasAccess)
     const imageRef = useRef()
+
+    const [commentClicked, setCommentClicked] = useState(false)
 
     const { sectionName } = useParams()
     useEffect(() => {
@@ -98,6 +100,10 @@ function Post({ post, saveInLS, updatePost, index }) {
         setAction({...tmpState})
     }
 
+    if (commentClicked) {
+        return <Redirect to={sectionName === undefined ? `/post/${post._id}` : `/section/${sectionName}/post/${post._id}`} />
+    }
+
     return (
         <div className={classes.postWrapper}>
             <Link to={`/post/${post._id}`}>
@@ -124,7 +130,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                 </div>
                 <div onClick={(e) => {
                     e.preventDefault()
-
+                    setCommentClicked(true)
                 }}>
                     <p>💬</p>
                     <p>{post.commentsAmount}</p>
