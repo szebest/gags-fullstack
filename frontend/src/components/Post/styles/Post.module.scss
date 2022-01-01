@@ -27,7 +27,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    padding-left: 10%;
+    padding-left: 2%;
     width: 100%;
     gap: 25px;
 
@@ -36,13 +36,24 @@
         display: flex;
         justify-content: space-evenly;
         align-items: center;
-        min-width: 15%;
+        width: 100px;
+        min-width: fit-content;
         border: 1px solid rgba(180 180 180 / 0.65);
         border-radius: 10px;
+        gap: 10px;
         
         p {
             margin: 10% 0px;
+
+            &:first-child() {
+                margin-left: 10px;
+            }
+
+            &:last-child() {
+                margin-right: 10px;
+            }
         }
+
     }
 
     div:hover {
@@ -77,6 +88,10 @@
     &:hover {
         background-color: rgba(0 119 255 / .25) !important;
     }
+}
+
+.fullWidth {
+    width: 100%;
 }
 
 @media (max-width: 800px) {

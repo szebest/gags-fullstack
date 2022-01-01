@@ -26,8 +26,10 @@ function PostsContainerAPI({ sectionName }) {
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-                accessToken: Cookies.get("accessToken")
-            })
+            }),
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)

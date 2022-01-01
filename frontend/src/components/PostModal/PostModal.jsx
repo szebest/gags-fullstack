@@ -47,7 +47,7 @@ export default function PostModal() {
         refreshComments()
     }, [post])
 
-    useEffect(() => {
+    function getPost() {
         if (!postID) return
         axios({
             method: "GET",
@@ -62,6 +62,10 @@ export default function PostModal() {
         .catch(err => {
             console.error(err)
         })
+    }
+
+    useEffect(() => {
+        getPost()
     }, [postID])
 
     useEffect(() => {
@@ -113,7 +117,7 @@ export default function PostModal() {
                     <NewComment sendComment={sendComment} parentComment={null}>
                         <button onClick={refreshComments}>Refresh comment section</button>
                     </NewComment>
-                    <div className={classes.container}>
+                    <div id="comments" className={classes.container}>
                         <div className={classes.commentWrapper}>
                             {post.comments && post.comments.map((comment, index) => <Comment updateThisComment={updateComment} postID={postID} comment={comment} sendComment={sendComment} index={index} key={comment._id} />)}
                         </div>

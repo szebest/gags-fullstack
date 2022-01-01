@@ -108,7 +108,7 @@ function Post({ post, saveInLS, updatePost, index }) {
             <div className={classes.center}>
                 <h6>Posted in {post.section} by {post.author}</h6>
             </div>
-            <Link to={sectionName === undefined ? `/post/${post._id}` : `/section/${sectionName}/post/${post._id}`}>
+            <Link className={classes.fullWidth} to={sectionName === undefined ? `/post/${post._id}` : `/section/${sectionName}/post/${post._id}`}>
                 <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
                     <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
                 </div>
@@ -121,6 +121,13 @@ function Post({ post, saveInLS, updatePost, index }) {
                 <div className={action.dislike ? classes.clicked : ""} onClick={dislike}>
                     <p>▼</p>
                     <p>{post.dislikes}</p>
+                </div>
+                <div onClick={(e) => {
+                    e.preventDefault()
+
+                }}>
+                    <p>💬</p>
+                    <p>{post.commentsAmount}</p>
                 </div>
             </div>
         </div>
