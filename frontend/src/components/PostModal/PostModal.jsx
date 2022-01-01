@@ -101,7 +101,10 @@ export default function PostModal() {
 
     return ReactDom.createPortal(
         <>
-            <Link to={sectionName === undefined ? `/` : `/section/${sectionName}`} className={`${classes.overlay} ${classes.fadeIn}`}></Link>
+            <Link to={window.location.pathname.split('/').reduce((previous, current, index, array) => {
+                if (index + 2 < array.length) return previous + '/' + current
+                else return previous
+            })} className={`${classes.overlay} ${classes.fadeIn}`}></Link>
             {post && <div className={`${classes.modalWrapper} ${classes.fadeIn}`}>
                 <Scrollbars
                     autoHide

@@ -121,6 +121,10 @@ function App() {
                     <MainSite />
                     <PostModal />
                 </Route>
+                <Route exact path="/profile/post/:postID">
+                    <ProfileSite />
+                    <PostModal />
+                </Route>
             </Switch>
         </Router>
     );

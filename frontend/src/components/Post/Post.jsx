@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
-import { useParams, Link, Redirect } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 
 function Post({ post, saveInLS, updatePost, index }) {
     const [loaded, setLoaded] = useState(false)
@@ -16,8 +16,11 @@ function Post({ post, saveInLS, updatePost, index }) {
     const imageRef = useRef()
 
     const [commentClicked, setCommentClicked] = useState(false)
+    const [redirectTo, setRedirectTo] = useState("")
 
-    const { sectionName } = useParams()
+    useEffect(() => {
+        setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
+    }, [window.location.pathname])
     useEffect(() => {
         if (!post._id) return
 
@@ -101,12 +104,12 @@ function Post({ post, saveInLS, updatePost, index }) {
     }
 
     if (commentClicked) {
-        return <Redirect to={sectionName === undefined ? `/post/${post._id}` : `/section/${sectionName}/post/${post._id}`} />
+        return <Redirect to={redirectTo} />
     }
 
     return (
         <div className={classes.postWrapper}>
-            <Link to={`/post/${post._id}`}>
+            <Link to={redirectTo}>
                 <div className={classes.center}>
                     <h2>{post.title}</h2>
                 </div>
@@ -114,7 +117,7 @@ function Post({ post, saveInLS, updatePost, index }) {
             <div className={classes.center}>
                 <h6>Posted in {post.section} by {post.author}</h6>
             </div>
-            <Link className={classes.fullWidth} to={sectionName === undefined ? `/post/${post._id}` : `/section/${sectionName}/post/${post._id}`}>
+            <Link className={classes.fullWidth} to={redirectTo}>
                 <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
                     <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
                 </div>
@@ -130,7 +133,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                 </div>
                 <div onClick={(e) => {
                     e.preventDefault()
-                    setCommentClicked(true)
+                    if (saveInLS === undefined) setCommentClicked(true)
                 }}>
                     <p>💬</p>
                     <p>{post.commentsAmount}</p>

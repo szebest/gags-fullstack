@@ -124,10 +124,7 @@ function ProfileSite() {
         return <Redirect to="/" />
 
     if (hasAccess === null) 
-        return (
-            <>
-            </>
-        )
+        return null
 
     return (
         <div className={classes.siteCenter}>
