@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import PostsContainer from '../../PostsContainer/PostsContainer'
 import { useSelector } from 'react-redux'
+import CommentsContainer from '../../CommentsContainer/CommentsContainer'
 
 function ProfileSite() {
     const [user, setUser] = useState({})
@@ -170,6 +171,9 @@ function ProfileSite() {
                     }
                     {selected === 1 &&
                         <PostsContainer posts={content} callForMore={getPostsLiked} ready={Object.keys(user).length !== 0} />
+                    }
+                    {
+                        <CommentsContainer />
                     }
                 </div>
             </div>

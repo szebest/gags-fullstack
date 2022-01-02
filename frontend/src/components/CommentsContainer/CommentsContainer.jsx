@@ -9,9 +9,9 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
 
-    useEffect(() => {
-        if (isVisible && (ready !== undefined && ready || ready === undefined) && false) callForMore()
-    }, [isVisible, sectionName, ready])
+    /*useEffect(() => {
+        if (isVisible && (ready !== undefined && ready || ready === undefined)) callForMore()
+    }, [isVisible, sectionName, ready])*/
 
     return (
         <>
