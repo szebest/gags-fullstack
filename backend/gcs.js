@@ -38,7 +38,7 @@ const uploadFile = async (mimeType, originalname, buffer, folderName) => {
         fields: 'id'
     })
 
-    return `https://drive.google.com/uc?id=${response.data.id}`
+    return `https://drive.google.com/uc?export=view&id=${response.data.id}`
 }
 
 exports.uploadFile = uploadFile

@@ -9,15 +9,14 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cors = require('cors')
 const multer = require('multer')
-const upload = multer({ 
+const upload = multer({
     limits: {
         fileSize: 3 * 1024 * 1024, // no larger than 3mb
-    } 
-    })
+    }
+})
 const sharp = require('sharp')
 const { uploadFile } = require('./gcs')
 const dnsPrefetchControl = require('dns-prefetch-control')
-const { syncIndexes, findOneAndUpdate } = require('./models/user')
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URL)
 
@@ -46,7 +45,7 @@ app.post('/hasAccess', (req, res) => {
     const accessToken = req.body.accessToken
 
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err) => {
-        return res.send({access: !err})
+        return res.send({ access: !err })
     })
 })
 
@@ -61,20 +60,20 @@ app.post('/login', async (req, res) => {
         else {
             const samePasswords = await bcrypt.compare(password, users[0].password)
             if (samePasswords) {
-                const accessToken = jwt.sign({username: users[0].username}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.EXPIRES_IN })
-                const refreshToken = jwt.sign({username: users[0].username}, process.env.REFRESH_TOKEN_SECRET)
+                const accessToken = jwt.sign({ username: users[0].username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.EXPIRES_IN })
+                const refreshToken = jwt.sign({ username: users[0].username }, process.env.REFRESH_TOKEN_SECRET)
 
                 const refresh = new Refresh({
                     refreshToken,
                     username
                 })
-            
+
                 try {
                     await refresh.save()
                     res.status(201).json({ accessToken, refreshToken, expiresIn: process.env.EXPIRES_IN })
                 }
                 catch (err) {
-                    res.status(400).json({ message: err.message})
+                    res.status(400).json({ message: err.message })
                 }
             }
             else
@@ -83,13 +82,13 @@ app.post('/login', async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.status(500).json({ message: err.message})
+        res.status(500).json({ message: err.message })
     }
 })
 
 app.post('/logout', async (req, res) => {
     const refreshToken = req.body.refreshToken
-    
+
     try {
         const removed = await Refresh.deleteOne({ refreshToken })
 
@@ -115,11 +114,11 @@ app.post('/refresh', async (req, res) => {
             jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
                 if (err)
                     return res.sendStatus(400)
-                    
-                    const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.EXPIRES_IN })
 
-                    res.status(200).json({ accessToken })
-                })
+                const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.EXPIRES_IN })
+
+                res.status(200).json({ accessToken })
+            })
         }
     }
     catch (err) {
@@ -133,21 +132,21 @@ app.post('/register', upload.single("file"), async (req, res) => {
     const username = req.body.username
 
     let imageResult = await sharp(req.file.buffer)
-                            .resize({ width: 100, height: 100 })
-                            .toFormat(req.file.mimetype.split('/')[1])
-                            .toBuffer()
+        .resize({ width: 100, height: 100 })
+        .toFormat(req.file.mimetype.split('/')[1])
+        .toBuffer()
 
     const fileSrc = await uploadFile(req.file.mimetype, req.file.originalname, imageResult.buffer, '1Rw43VHhxDzmpsY-CVfPeUjH1-ee5gyfh')
 
     try {
-        const users = await User.find({username})
-        if (users.length > 0) return res.status(409).json({ message: "A user with this login already exists"})
+        const users = await User.find({ username })
+        if (users.length > 0) return res.status(409).json({ message: "A user with this login already exists" })
     }
     catch (err) {
         console.log(err)
-        return res.status(500).json({ message: err.message})
+        return res.status(500).json({ message: err.message })
     }
-    
+
     const user = new User({
         username: username,
         password: hashedPassword,
@@ -164,7 +163,7 @@ app.post('/register', upload.single("file"), async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        return res.status(400).json({ message: err.message})
+        return res.status(400).json({ message: err.message })
     }
 })
 
@@ -194,7 +193,7 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
 
     try {
         const newPost = await post.save()
-        
+
         const user = (await User.find({ username }))[0]
 
         user.postsCreated.unshift({})
@@ -211,7 +210,82 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
 })
 
 app.get('/sections', (req, res) => {
-    res.status(200).send({ sections: sections})
+    res.status(200).send({ sections: sections })
+})
+
+app.get('/user/postsLiked', authenticateToken, async (req, res) => {
+    const firstPost = parseInt(req.query.postNumber)
+    const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
+    const username = req.username
+
+    try {
+        const userLikedPosts = (await User.findOne({ username }).lean()).postsLiked
+
+        const slicedPosts = userLikedPosts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts)
+
+        const posts = []
+
+        for (const slicedPost of slicedPosts) {
+            if (slicedPost.actionType !== "none") {
+                const post = await Posts.findById(slicedPost.postId).lean()
+
+                post.actionType = slicedPost.actionType
+                post.commentsAmount = post.comments.length
+                delete post.comments
+
+                posts.unshift(post)
+            }
+        }
+
+        const numberOfPostsLeft = Math.max(userLikedPosts.length - firstPost - amountOfReturnedPosts, 0)
+        return res.status(200).json({
+            posts,
+            numberOfPostsLeft
+        })
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(400)
+    }
+})
+
+app.get('/user/postsCreated', authenticateToken, async (req, res) => {
+    const firstPost = parseInt(req.query.postNumber)
+    const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
+    const username = req.username
+
+    try {
+        const userCreatedPosts = (await User.findOne({ username }).lean()).postsCreated
+
+        const userLikedPosts = (await User.findOne({ username }).lean()).postsLiked
+
+        const slicedPosts = userCreatedPosts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts)
+
+        const posts = []
+
+        for (const slicedPost of slicedPosts) {
+            const post = await Posts.findById(slicedPost.postId).lean()
+
+            userLikedPosts.forEach((likedPost) => {
+                if (likedPost.postId.toString() === slicedPost.postId.toString()) post.actionType = likedPost.actionType
+            })
+
+            post.commentsAmount = post.comments.length
+            delete post.comments
+
+            posts.unshift(post)
+        }
+
+        const numberOfPostsLeft = Math.max(userCreatedPosts.length - firstPost - amountOfReturnedPosts, 0)
+        return res.status(200).json({
+            posts,
+            numberOfPostsLeft
+        })
+    }
+    catch (err) {
+        console.log(err)
+        return res.status(400)
+    }
 })
 
 app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
@@ -221,12 +295,12 @@ app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
 
     if (!updatedRead)
         return res.sendStatus(400)
-    
+
     try {
         const foundUser = (await User.find({ username }).lean())[0]
 
         foundUser.notifications.forEach((notification, index) => {
-            if (notification._id.toString() === notificationID.toString()) 
+            if (notification._id.toString() === notificationID.toString())
                 foundUser.notifications[index].read = updatedRead
         })
 
@@ -234,7 +308,7 @@ app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
 
         return res.sendStatus(200)
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         res.sendStatus(500)
     }
@@ -246,12 +320,12 @@ app.get('/user/:accessToken', (req, res) => {
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
         if (err)
             return res.sendStatus(403)
-        
+
         const username = user.username
 
-        const users = await User.find({username})
+        const users = await User.find({ username })
 
-        res.status(200).send({user: users[0]})
+        res.status(200).send({ user: users[0] })
     })
 })
 
@@ -261,9 +335,9 @@ app.get('/user/avatar/:username', async (req, res) => {
     try {
         const foundUser = (await User.find({ username }).lean())[0]
 
-        return res.status(200).send({imgSrc: foundUser.imgSrc})
+        return res.status(200).send({ imgSrc: foundUser.imgSrc })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         res.sendStatus(500)
     }
@@ -287,17 +361,17 @@ app.get('/posts', checkToken, async (req, res) => {
 
             slicedPost.commentsAmount = slicedPost.comments.length
             delete slicedPost.comments
-            
+
             return slicedPost
         })
 
         const numberOfPostsLeft = Math.max(posts.length - firstPost - amountOfReturnedPosts, 0)
-        return res.status(200).json({ 
-            posts: slicedPosts, 
+        return res.status(200).json({
+            posts: slicedPosts,
             numberOfPostsLeft
         })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         return res.status(400)
     }
@@ -322,11 +396,11 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
         found.comments[0].likes = 0
         found.comments[0].dislikes = 0
 
-        const updatedPost = await Posts.findByIdAndUpdate(postID, found, {new: true})
+        const updatedPost = await Posts.findByIdAndUpdate(postID, found, { new: true })
 
         return res.status(200).send({ comment: updatedPost.comments[0] })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         return res.sendStatus(400)
     }
@@ -365,7 +439,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
                     foundPost.comments[foundCommentIndex].dislikes += dislike
                 }
             }
-            
+
             if (actionDid === 'dislike' && dislike === -1) {
                 foundPost.comments[foundCommentIndex].dislikes += dislike
                 if (like === 0) foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'none'
@@ -386,7 +460,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
             }
         }
         else {
-            foundPost.comments[foundCommentIndex].likes += like 
+            foundPost.comments[foundCommentIndex].likes += like
             foundPost.comments[foundCommentIndex].dislikes += dislike
         }
 
@@ -398,15 +472,15 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
         }
 
         foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = like === 1 ? 'like' :
-                                                    (dislike === 1 ? 'dislike' : 'none')
+            (dislike === 1 ? 'dislike' : 'none')
 
         await Posts.findByIdAndUpdate(postID, foundPost)
 
-        await User.findOneAndUpdate({username}, foundUser)
+        await User.findOneAndUpdate({ username }, foundUser)
 
         return res.status(200).send({ updatedComment: foundPost.comments[foundCommentIndex] })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         return res.sendStatus(400)
     }
@@ -426,7 +500,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
                 return postLiked.postId && postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
             })
 
-            if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType 
+            if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType
         }
 
         found.commentsAmount = found.comments.length
@@ -435,7 +509,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
 
         return res.status(200).json({ post: found })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         return res.sendStatus(400)
     }
@@ -448,7 +522,7 @@ app.get('/posts/:id/comment', checkToken, async (req, res) => {
     try {
         const found = await Posts.findById(postID).lean()
         if (username) {
-            const foundUser = await User.findOne({username})
+            const foundUser = await User.findOne({ username })
 
             found.comments.map((comment) => {
                 const foundIndex = foundUser.commentsLiked.findIndex((commentLiked) => {
@@ -463,7 +537,7 @@ app.get('/posts/:id/comment', checkToken, async (req, res) => {
 
         return res.status(200).json({ comments: found.comments })
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
         return res.sendStatus(400)
     }
@@ -544,13 +618,13 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
         }
 
         foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = like === 1 ? 'like' :
-                                                    (dislike === 1 ? 'dislike' : 'none')
+            (dislike === 1 ? 'dislike' : 'none')
 
-        foundPost.nextLikeMilestone = foundMilestoneIndex > -1 ? 
-            (nextMilestoneExists ? postLikeMilestones[foundMilestoneIndex + 1] : -1) 
+        foundPost.nextLikeMilestone = foundMilestoneIndex > -1 ?
+            (nextMilestoneExists ? postLikeMilestones[foundMilestoneIndex + 1] : -1)
             : foundPost.nextLikeMilestone
 
-        const updatedPost = await Posts.findByIdAndUpdate(postObjectID, foundPost, {new: true}).lean()
+        const updatedPost = await Posts.findByIdAndUpdate(postObjectID, foundPost, { new: true }).lean()
 
         updatedPost.commentsAmount = updatedPost.comments.length
 
@@ -588,7 +662,7 @@ function authenticateToken(req, res, next) {
     else {
         jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
             if (err) return res.sendStatus(403)
-            
+
             req.username = user.username
             next()
         })
@@ -637,5 +711,5 @@ io.on('connection', (socket) => {
 
     socket.on('close', () => disconnect())
     socket.on('disconnect', () => disconnect())
-    
+
 })
