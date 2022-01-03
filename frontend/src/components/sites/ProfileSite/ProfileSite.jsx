@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import PostsContainerAPI from '../../PostsContainer/PostsContainerAPI'
 import { useSelector } from 'react-redux'
-import CommentsContainer from '../../CommentsContainer/CommentsContainer'
+import CommentsContainerAPI from '../../CommentsContainer/CommentsContainerAPI'
 
 function ProfileSite() {
     const [user, setUser] = useState({})
@@ -78,7 +78,10 @@ function ProfileSite() {
                             Posts liked
                         </li>
                         <li onClick={() => setSelected(2)} className={selected === 2 ? classes.selected : null}>
-                            Posts commented
+                            Comments created
+                        </li>
+                        <li onClick={() => setSelected(3)} className={selected === 3 ? classes.selected : null}>
+                            Comments liked
                         </li>
                     </ul>
                 </div>
@@ -97,8 +100,11 @@ function ProfileSite() {
                     {selected === 1 &&
                         <PostsContainerAPI requestType={"liked"} arePostsAvailable={arePostsAvailable} />
                     }
-                    {selected === 2
-                        /*<CommentsContainer />*/
+                    {selected === 2 &&
+                        <CommentsContainerAPI requestType={"created"} arePostsAvailable={arePostsAvailable} />
+                    }
+                    {selected === 3 &&
+                        <CommentsContainerAPI requestType={"liked"} arePostsAvailable={arePostsAvailable} />
                     }
                 </div>
             </div>

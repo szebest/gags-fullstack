@@ -4,6 +4,7 @@ import NewComment from '../NewComment/NewComment'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 export default function Comment({postID, comment, sendComment, updateThisComment, index}) {
     const [openReply, setOpenReply] = useState(false)
@@ -82,39 +83,46 @@ export default function Comment({postID, comment, sendComment, updateThisComment
     }
 
     return (
-        <div className={classes.commentSplit}>
-            <div
-                key={comment._id}
-                className={classes.commentContainer}
-            >
-                <div className={classes.profilePictureHolder}>
-                    <img alt="avatar" width="28" height="28" src={avatar} />
+        <>
+            {comment && comment.postTitle &&
+                <div className={classes.postTitle}>
+                    <h3>Commented in: <Link to={window.location.pathname === "/" ? `post/${comment.postId}` : `${window.location.pathname}/post/${comment.postId}`}>{comment.postTitle}</Link></h3>
                 </div>
-                <div className={classes.contentHolder}>
-                    <div className={classes.author}>
-                        <a target="_blank" href={`/profile/${comment.author}`}>{comment.author}</a>
+            }
+            <div className={classes.commentSplit}>
+                <div
+                    key={comment._id}
+                    className={classes.commentContainer}
+                >
+                    <div className={classes.profilePictureHolder}>
+                        <img alt="avatar" width="28" height="28" src={avatar} />
                     </div>
-                    <div className={classes.comment}>{comment.comment}</div>
+                    <div className={classes.contentHolder}>
+                        <div className={classes.author}>
+                            <a target="_blank" href={`/profile/${comment.author}`}>{comment.author}</a>
+                        </div>
+                        <div className={classes.comment}>{comment.comment}</div>
+                    </div>
+                </div>
+                <div className={classes.commentControl}>
+                    <div onClick={like} className={`${classes.controlContainer} ${classes.hoverBackground} ${action.like ? `${classes.activeLike}` : ''}`}>
+                        <p>▲</p>
+                        <p>{comment.likes}</p>
+                    </div>
+                    <div onClick={dislike} className={`${classes.controlContainer} ${classes.hoverBackground} ${action.dislike ? `${classes.activeLike}` : ''}`}>
+                        <p>▼</p>
+                        <p>{comment.dislikes}</p>
+                    </div>
+                    <div onClick={() => setOpenReply(prev => !prev)} className={`${classes.controlContainer} ${classes.hoverBackground}`}>
+                        <p>Reply</p>
+                    </div>
+                </div>
+                <div>
+                    {openReply && 
+                    <NewComment sendComment={sendCommentForward} parentComment={comment._id} />
+                    }
                 </div>
             </div>
-            <div className={classes.commentControl}>
-                <div onClick={like} className={`${classes.controlContainer} ${classes.hoverBackground} ${action.like ? `${classes.activeLike}` : ''}`}>
-                    <p>▲</p>
-                    <p>{comment.likes}</p>
-                </div>
-                <div onClick={dislike} className={`${classes.controlContainer} ${classes.hoverBackground} ${action.dislike ? `${classes.activeLike}` : ''}`}>
-                    <p>▼</p>
-                    <p>{comment.dislikes}</p>
-                </div>
-                <div onClick={() => setOpenReply(prev => !prev)} className={`${classes.controlContainer} ${classes.hoverBackground}`}>
-                    <p>Reply</p>
-                </div>
-            </div>
-            <div>
-                {openReply && 
-                <NewComment sendComment={sendCommentForward} parentComment={comment._id} />
-                }
-            </div>
-        </div>
+        </>
     )
 }

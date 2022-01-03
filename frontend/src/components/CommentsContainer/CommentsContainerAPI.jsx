@@ -4,10 +4,12 @@ import Cookies from 'js-cookie'
 import CommentsContainer from './CommentsContainer'
 import axios from 'axios'
 
-export default function CommentsContainerAPI({ sectionName, postID }) {
-    const [comments, setComments] = useState()
+export default function CommentsContainerAPI({ sectionName, postID, requestType, arePostsAvailable, showNewComment }) {
+    const [comments, setComments] = useState([])
 
-    function refreshComments() {
+    let sendRequest
+
+    function postComments() {
         axios.get(`http://localhost:3001/posts/${postID}/comment`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
@@ -21,9 +23,44 @@ export default function CommentsContainerAPI({ sectionName, postID }) {
         })
     }
 
+    function commentsCreated() {
+        axios.get(`http://localhost:3001/user/commentsCreated`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+        .then(res => {
+            console.log(res.data.comments)
+            setComments([...res.data.comments])
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+    function commentsLiked() {
+        axios.get(`http://localhost:3001/user/commentsLiked`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+        .then(res => {
+            setComments([...res.data.comments])
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+
+    useEffect(() => {
+        if (arePostsAvailable)
+
+        arePostsAvailable(comments.length > 0)
+    }, [comments])
+
     function updateComment(updatedComment, index) {
         const tmpComments = comments
-        tmpComments[index] = updatedComment
+        tmpComments[index] = {...tmpComments[index], ...updatedComment}
         setComments([...tmpComments])
     }
 
@@ -45,11 +82,26 @@ export default function CommentsContainerAPI({ sectionName, postID }) {
         })
     }
 
-    useEffect(() => {
-        if (comments) return
+    switch (requestType) {
+        case "default":
+            sendRequest = postComments
+            break;
+        case "liked":
+            sendRequest = commentsLiked
+            break;
+        case "created":
+            sendRequest = commentsCreated
+            break;
+        default:
+            sendRequest = postComments
+            break;
+    }
 
-        refreshComments()
-    }, [comments])
+    useEffect(() => {
+        if (comments.length > 0) return
+
+        sendRequest()
+    }, [])
 
     return (
         <div className={classes.commentsContainerWrapper}>
@@ -58,8 +110,9 @@ export default function CommentsContainerAPI({ sectionName, postID }) {
                 sectionName={sectionName}
                 updateComment={updateComment}
                 sendComment={sendComment}
-                refreshComments={refreshComments}
+                refreshComments={sendRequest}
                 postID={postID}
+                showNewComment={showNewComment}
             />
         </div>
     )

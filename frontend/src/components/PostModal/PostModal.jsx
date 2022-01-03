@@ -69,7 +69,7 @@ export default function PostModal() {
                         index={0}
                         saveInLS={true}
                     />
-                    <CommentsContainer sectionName={sectionName} postID={postID}/>
+                    <CommentsContainer sectionName={sectionName} postID={postID} showNewComment />
                 </Scrollbars>
             </div>}
         </>,
