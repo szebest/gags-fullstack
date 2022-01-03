@@ -288,6 +288,72 @@ app.get('/user/postsCreated', authenticateToken, async (req, res) => {
     }
 })
 
+app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
+    const username = req.username
+
+    try {
+        const user = await User.findOne({ username })
+
+        const postsWithUserAction = await Posts.find({ "comments.userId": user._id }).lean()
+
+        const comments = []
+
+        postsWithUserAction.reverse().forEach((postWithUserAction) => {
+            postWithUserAction.comments.reverse().forEach((comment) => {
+                if (comment.userId.toString() === user._id.toString()) {
+                    comments.unshift(comment)
+                    comments[0].postTitle = postWithUserAction.title
+
+                    user.commentsLiked.every((commentLiked) => {
+                        if (commentLiked.commentId.toString() === comment._id.toString()) {
+                            comments[0].actionType = commentLiked.actionType
+                            return false
+                        }
+
+                        return true
+                    })
+                }
+            })
+        })
+
+        return res.status(200).json({ comments })
+    }
+    catch(err) {
+        console.log(err)
+        return res.status(400)
+    }
+})
+
+app.get('/user/commentsLiked', authenticateToken, async (req, res) => {
+    const username = req.username
+
+    try {
+        const user = await User.findOne({ username })
+
+        const comments = []
+
+        for (const commentLiked of user.commentsLiked) {
+            if (commentLiked.actionType !== "none") {
+                const post = await Posts.findById(commentLiked.postId).lean()
+
+                post.comments.forEach((comment) => {
+                    if (comment._id.toString() === commentLiked.commentId.toString()) {
+                        comments.unshift(comment)
+                        comments[0].postTitle = post.title
+                        comments[0].actionType = commentLiked.actionType
+                    }
+                })
+            }
+        }
+
+        return res.status(200).json({ comments })
+    }
+    catch(err) {
+        console.log(err)
+        return res.status(400)
+    }
+})
+
 app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
     const notificationID = req.params.id
     const username = req.username
@@ -386,12 +452,16 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
     try {
         const found = await Posts.findById(postID).lean()
 
+        const foundUser = await User.findOne({ username })
+
         found.comments = found.comments ?? []
         found.comments.unshift({})
         found.comments[0].postID = postID
         //TODO: add children comments to the parent comment
         parentCommentID ? found.comments[0].parentCommentId = parentCommentID : ""
         found.comments[0].author = username
+        found.comments[0].userId = foundUser._id
+        found.comments[0].postId = postID
         found.comments[0].comment = comment
         found.comments[0].likes = 0
         found.comments[0].dislikes = 0
@@ -418,7 +488,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
     try {
         const foundPost = await Posts.findById(postID).lean()
 
-        const foundUser = (await User.find({ username }).lean())[0]
+        const foundUser = await User.findOne({ username }).lean()
 
         const foundCommentIndex = foundPost.comments.findIndex(comment => {
             return comment._id.toString() === mongoose.Types.ObjectId(commentID).toString()
@@ -469,6 +539,7 @@ app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, re
             foundAlreadyLikedCommentIndex = 0
 
             foundUser.commentsLiked[foundAlreadyLikedCommentIndex].commentId = foundPost.comments[foundCommentIndex]._id
+            foundUser.commentsLiked[foundAlreadyLikedCommentIndex].postId = postID
         }
 
         foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = like === 1 ? 'like' :

@@ -2,7 +2,7 @@ POST http://localhost:3001/login
 Content-Type: application/json
 
 {
-    "username": "aaaa",
+    "username": "aaaaaa",
     "password": "aaaaaa"
 }
 
@@ -31,7 +31,7 @@ POST http://localhost:3001/refresh
 Content-Type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN6YXJlayIsImlhdCI6MTYzMTc5NDIwNH0.HrwD9XDxhxV-6xrZwcUPeYQYoeSeVX7JXVLhVei87Z8"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWFhYSIsImlhdCI6MTY0MTIxMjkwNH0.EHf-FC_6q1voOCcYjW0A15NrAoMjn6GOxq5POEVF-38"
 }
 
 ###
@@ -40,6 +40,11 @@ GET http://localhost:3001
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkN6YXJlayIsImlhdCI6MTYzMTc4NzMxNCwiZXhwIjoxNjMxNzg5MTE0fQ.ujXyLtTazVyjP4ej94ybfg_7iv5iEurelmhqHcrQxtw
 
+###
+
+GET http://localhost:3001/user/commentsLiked
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWFhYSIsImlhdCI6MTY0MTIyMjUwNCwiZXhwIjoxNjQxMjI0MzA0fQ.Prkwumlzr3iJUemLgyHrknXGngmvx60wGqHYiQMj3Ko
 
 ###
 

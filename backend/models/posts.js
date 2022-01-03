@@ -5,6 +5,10 @@ const postCommentRelationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     parentCommentId: {
         type: mongoose.Schema.Types.ObjectId,
         required: false
