@@ -30,7 +30,6 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
             }
         })
         .then(res => {
-            console.log(res.data.comments)
             setComments([...res.data.comments])
         })
         .catch(err => {
