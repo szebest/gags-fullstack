@@ -7,10 +7,18 @@ import { useIsVisible } from 'react-is-visible'
 function PostsContainer({posts, callForMore, sectionName, ready, updatePost}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
+    const first = useRef(true)
 
     useEffect(() => {
-        if (isVisible && (ready !== undefined && ready || ready === undefined)) callForMore()
+        if (isVisible && (ready !== undefined && ready || ready === undefined)) {
+            first.current = false
+            callForMore()
+        }
     }, [isVisible, sectionName, ready])
+
+    useEffect(() => {
+        setTimeout(() => {if (first.current) callForMore()}, 1000)
+    }, [])
 
     return (
         <div className={classes.limitSpace}>

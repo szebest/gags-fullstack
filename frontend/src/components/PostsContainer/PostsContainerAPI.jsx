@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-function PostsContainerAPI({ sectionName }) {
+function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const postsPerRequest = 5
     const [postNumber, setPostNumber] = useState(0)
     const [postsAvailable, setPostsAvailable] = useState(true)
@@ -16,7 +16,13 @@ function PostsContainerAPI({ sectionName }) {
         setPosts([...tmpPosts])
     }
 
-    const sendRequest = () => {
+    useEffect(() => {
+        if (arePostsAvailable)
+
+        arePostsAvailable(posts.length)
+    }, [posts])
+
+    const getMainSitePosts = () => {
         if (!postsAvailable) return
 
         axios({
@@ -39,6 +45,73 @@ function PostsContainerAPI({ sectionName }) {
         .catch(err => {
             console.error(err)
         })
+    }
+
+    const getPostsLiked = () => {
+        if (!postsAvailable) return
+
+        axios({
+            method: "GET",
+            url: `http://localhost:3001/user/postsLiked`,
+            params: new URLSearchParams({
+                postNumber,
+                postsPerRequest,
+                section: sectionName ? sectionName : undefined,
+            }),
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+        .then(res => {
+            setPostsAvailable(res.data.numberOfPostsLeft > 0)
+            setPosts(prev => [...prev, ...res.data.posts])
+            setPostNumber(prev => prev + postsPerRequest)
+        })
+        .catch(err => {
+            console.error(err)
+        })
+    }
+
+    const getPostsCreated = () => {
+        if (!postsAvailable) return
+
+        axios({
+            method: "GET",
+            url: `http://localhost:3001/user/postsCreated`,
+            params: new URLSearchParams({
+                postNumber,
+                postsPerRequest,
+                section: sectionName ? sectionName : undefined,
+            }),
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+        .then(res => {
+            setPostsAvailable(res.data.numberOfPostsLeft > 0)
+            setPosts(prev => [...prev, ...res.data.posts])
+            setPostNumber(prev => prev + postsPerRequest)
+        })
+        .catch(err => {
+            console.error(err)
+        })
+    }
+    
+    let sendRequest
+
+    switch (requestType) {
+        case "default":
+            sendRequest = getMainSitePosts
+            break;
+        case "liked":
+            sendRequest = getPostsLiked
+            break;
+        case "created":
+            sendRequest = getPostsCreated
+            break;
+        default:
+            sendRequest = getMainSitePosts
+            break;
     }
 
     useEffect(() => {

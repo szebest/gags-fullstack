@@ -3,18 +3,14 @@ import { useState, useEffect } from 'react'
 import { Redirect } from "react-router-dom"
 import Cookies from 'js-cookie'
 import axios from 'axios'
-import PostsContainer from '../../PostsContainer/PostsContainer'
+import PostsContainerAPI from '../../PostsContainer/PostsContainerAPI'
 import { useSelector } from 'react-redux'
 import CommentsContainer from '../../CommentsContainer/CommentsContainer'
 
 function ProfileSite() {
     const [user, setUser] = useState({})
     const [selected, setSelected] = useState(0)
-    const [content, setContent] = useState([])
     const [daysActive, setDaysActive] = useState()
-
-    const postsPerRequest = 5
-    const [postNumber, setPostNumber] = useState(0)
     const [postsAvailable, setPostsAvailable] = useState(true)
 
     const hasAccess = useSelector(state => state.hasAccess)
@@ -26,73 +22,8 @@ function ProfileSite() {
         return result
     }
 
-    const getPostsLiked = () => {
-        if (!postsAvailable) return
-
-        const promises = []
-        const requestArray = user.postsLiked.slice(postNumber, postNumber + postsPerRequest)
-        requestArray.forEach((post) => {
-            const promise = new Promise((resolve, reject) => {
-                axios.get(`http://localhost:3001/posts/${post.postId}`)
-                .then(res => {
-                    const postReceived = res.data.post
-                    postReceived.actionType = post.actionType 
-                    resolve(postReceived)
-                })
-                .catch(err => {
-                    console.log(err)
-                    reject()
-                })
-            })
-            promises.push(promise)
-        })
-
-        Promise.all(promises).then((values) => {
-            setContent(prev => [...prev, ...values])
-        })
-
-        if (postNumber >= user.postsLiked.length) setPostsAvailable(false)
-        
-        setPostNumber(prev => prev + postsPerRequest)
-    }
-
-    const getPostsCreated = () => {
-        if (!postsAvailable) return
-    
-        const promises = []
-        const requestArray = user.postsCreated.slice(postNumber, postNumber + postsPerRequest)
-        requestArray.forEach((post) => {
-            const promise = new Promise((resolve, reject) => {
-                axios.get(`http://localhost:3001/posts/${post.postId}`)
-                .then(res => {
-                    const postReceived = res.data.post
-                    let actionType = null
-                    const exists = user.postsLiked.some((postLiked) => {
-                        if (post.postId.toString() === postLiked.postId.toString()) {
-                            actionType = postLiked.actionType
-                            return true
-                        }
-
-                        return false
-                    })
-                    postReceived.actionType = actionType
-                    resolve(postReceived)
-                })
-                .catch(err => {
-                    console.log(err)
-                    reject()
-                })
-            })
-            promises.push(promise)
-        })
-
-        Promise.all(promises).then((values) => {
-            setContent(prev => [...prev, ...values])
-        })
-
-        if (postNumber >= user.postsCreated.length) setPostsAvailable(false)
-        
-        setPostNumber(prev => prev + postsPerRequest)
+    function arePostsAvailable(value) {
+        setPostsAvailable(value)
     }
 
     useEffect(() => {
@@ -103,12 +34,6 @@ function ProfileSite() {
         .catch(err => {
             console.log(err)
         })
-    }, [selected])
-
-    useEffect(async () => {
-        setPostsAvailable(true)
-        setPostNumber(0)
-        setContent([])
     }, [selected])
 
     useEffect(() => {
@@ -158,7 +83,7 @@ function ProfileSite() {
                     </ul>
                 </div>
                 <div className={classes.content}>
-                    {content && content.length === 0 && 
+                    {!postsAvailable && 
                         <div className={classes.siteCenter}>
                             <div className={classes.suchEmpty}>
                                 <p>GAGS</p>
@@ -167,13 +92,13 @@ function ProfileSite() {
                         </div>
                     }
                     {selected === 0 &&
-                        <PostsContainer posts={content} callForMore={getPostsCreated} ready={Object.keys(user).length !== 0} />
+                        <PostsContainerAPI requestType={"created"} arePostsAvailable={arePostsAvailable} />
                     }
                     {selected === 1 &&
-                        <PostsContainer posts={content} callForMore={getPostsLiked} ready={Object.keys(user).length !== 0} />
+                        <PostsContainerAPI requestType={"liked"} arePostsAvailable={arePostsAvailable} />
                     }
-                    {
-                        <CommentsContainer />
+                    {selected === 2
+                        /*<CommentsContainer />*/
                     }
                 </div>
             </div>
