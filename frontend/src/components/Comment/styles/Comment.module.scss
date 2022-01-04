@@ -16,6 +16,14 @@
     display: flex;
     flex-direction: column;
     outline: 1px solid rgba(0, 0, 0, 0.25);
+
+    > textarea {
+        align-self: center;
+        resize: vertical;
+        width: 90%;
+        min-height: 75px;
+        max-height: 300px;
+    }
 }
 
 .commentContainer {
@@ -36,6 +44,14 @@
 }
 
 .author {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    
+    p, a, i {
+        padding: 0;
+        margin: 0;
+    }
 
     a {
         color: inherit;
@@ -48,7 +64,8 @@
 }
 
 .comment {
-    
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .commentControl {
@@ -56,6 +73,18 @@
     flex-direction: row;
     padding-left: 7px;
     padding-bottom: 5px;
+}
+
+.actionButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 45%;
+    }
 }
 
 .controlContainer {
@@ -89,5 +118,46 @@
 
     &:hover {
         background-color: rgba(0 119 255 / .25) !important;
+    }
+}
+
+.relativeWrapper {
+    position: relative;
+}
+
+.optionsContainer {
+    display: flex;
+    flex-direction: column;
+
+    > div {
+        &.optionsContainerStyle {
+            border-radius: 50%;
+            width: 4px;
+            height: 4px;
+            background-color: black;
+        }
+    }
+}
+
+.optionsContainerContent {
+    width: max-content;
+    position: absolute;
+    border: 2px solid rgba(0 0 0 / 0.25);
+    background-color: white;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    p {
+        margin: 0 10px 0 10px;
+        padding: 10px 0 10px 0;
+        position: relative;
+        cursor: pointer;
+
+        &:not(:last-child) {
+            border-bottom: 2px solid black;
+        }
     }
 }
