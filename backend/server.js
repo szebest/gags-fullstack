@@ -571,9 +571,14 @@ app.patch('/posts/:postID/comment/:commentID/like', authenticateToken, async (re
             }
         }
         else {
+            if (dislike < 0 || like < 0) return res.status(400)
+
             foundPost.comments[foundCommentIndex].likes += like
             foundPost.comments[foundCommentIndex].dislikes += dislike
         }
+
+        if (foundPost.comments[foundCommentIndex].likes < 0) foundPost.comments[foundCommentIndex].likes = 0
+        if (foundPost.comments[foundCommentIndex].dislikes < 0) foundPost.comments[foundCommentIndex].dislikes = 0
 
         if (foundAlreadyLikedCommentIndex < 0) {
             foundUser.commentsLiked.unshift({})
