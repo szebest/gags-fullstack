@@ -312,6 +312,7 @@ app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
 
                         return true
                     })
+                    comment.isAuthor = true
                 }
             })
         })
@@ -341,6 +342,9 @@ app.get('/user/commentsLiked', authenticateToken, async (req, res) => {
                         comments.unshift(comment)
                         comments[0].postTitle = post.title
                         comments[0].actionType = commentLiked.actionType
+                    }
+                    if (comment.userId.toString() === user._id.toString()) {
+                        comment.isAuthor = true
                     }
                 })
             }
@@ -438,6 +442,43 @@ app.get('/posts', checkToken, async (req, res) => {
         })
     }
     catch (err) {
+        console.log(err)
+        return res.status(400)
+    }
+})
+
+app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, res) => {
+    const postID = req.params.postID
+    const commentID = req.params.commentID
+    const updatedCommentText = req.body.comment
+    const username = req.username
+
+    console.log(updatedCommentText)
+
+    try {
+        const postWithUpdatedComment = await Posts.findById(postID).lean()
+
+        const user = await User.findOne({username})
+
+        const commentIndex = postWithUpdatedComment.comments.findIndex((comment) => {
+            return comment._id.toString() === mongoose.Types.ObjectId(commentID).toString()
+        })
+
+        if (postWithUpdatedComment.comments[commentIndex].userId.toString() !== user._id.toString()) {
+            return res.status(400)
+        }
+
+        postWithUpdatedComment.comments[commentIndex].comment = updatedCommentText
+
+        postWithUpdatedComment.comments[commentIndex].edited = true
+
+        postWithUpdatedComment.comments[commentIndex].timestamp = Date.now()
+
+        await Posts.findByIdAndUpdate(postID, postWithUpdatedComment)
+
+        return res.status(200).json({ updatedComment: postWithUpdatedComment.comments[commentIndex] })
+    }
+    catch(err) {
         console.log(err)
         return res.status(400)
     }
@@ -601,6 +642,9 @@ app.get('/posts/:id/comment', checkToken, async (req, res) => {
                 })
                 if (foundIndex !== -1) {
                     comment.actionType = foundUser.commentsLiked[foundIndex].actionType
+                }
+                if (comment.userId.toString() === foundUser._id.toString()) {
+                    comment.isAuthor = true
                 }
                 return comment
             })
