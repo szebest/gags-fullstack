@@ -48,7 +48,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
 
         if (like === 0 && dislike === 0) return
 
-        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}`, {
+        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}/like`, {
             like, dislike
         }, {
             headers: {
@@ -110,7 +110,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
     }
 
     function sendUpdateRequest() {
-        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}`, {
+        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}/edit`, {
             comment: textEntered
         }, {
             headers: {
@@ -150,7 +150,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
         const differenceInHours = Math.ceil((treatAsUTC(dateNow) - treatAsUTC(commentTimestamp)) / millisecondsPerHour)
 
         if (differenceInHours < 24) {
-            setLastEdited(differenceInHours + (differenceInHours === 1 ? " hour ago" : " hours ago"))
+            setLastEdited(differenceInHours + (differenceInHours === 1 ? " hour ago" : " /likehours ago"))
             return
         }
 
