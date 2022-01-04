@@ -447,7 +447,7 @@ app.get('/posts', checkToken, async (req, res) => {
     }
 })
 
-app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, res) => {
+app.patch('/posts/:postID/comment/:commentID/edit', authenticateToken, async (req, res) => {
     const postID = req.params.postID
     const commentID = req.params.commentID
     const updatedCommentText = req.body.comment
@@ -517,7 +517,7 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
     }
 })
 
-app.patch('/posts/:postID/comment/:commentID', authenticateToken, async (req, res) => {
+app.patch('/posts/:postID/comment/:commentID/like', authenticateToken, async (req, res) => {
     const postID = req.params.postID
     const commentID = req.params.commentID
     const like = parseInt(req.body.like) || 0
