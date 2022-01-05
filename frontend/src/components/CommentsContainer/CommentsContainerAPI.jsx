@@ -57,10 +57,17 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
         arePostsAvailable(comments.length > 0)
     }, [comments])
 
-    function updateComment(updatedComment, index) {
+    function updateComment(updatedComment, index, shouldBeDeleted) {
         const tmpComments = comments
-        tmpComments[index] = {...tmpComments[index], ...updatedComment}
-        setComments([...tmpComments])
+
+        if (shouldBeDeleted === true) {
+            tmpComments.splice(index, 1)
+            setComments([...tmpComments])
+        }
+        else {
+            tmpComments[index] = {...tmpComments[index], ...updatedComment}
+            setComments([...tmpComments])
+        }
     }
 
     function sendComment(comment, parentComment) {

@@ -66,6 +66,15 @@
 .comment {
     margin-top: 5px;
     margin-bottom: 5px;
+
+    word-break: break-word;
+    white-space: pre-line;
+
+    margin-right: 25px;
+
+    p {
+        margin: 0;
+    }
 }
 
 .commentControl {

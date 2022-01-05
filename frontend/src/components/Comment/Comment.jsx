@@ -110,6 +110,17 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
     }
 
     function sendUpdateRequest() {
+        var onlySpaces = true
+        textEntered.split('').forEach((char) => {
+            if (char !== ' ') onlySpaces = false
+        })
+
+        if (textEntered === comment.comment || onlySpaces) {
+            setOpenReply(false)
+            setEditing(false)
+            return
+        }
+
         axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}/edit`, {
             comment: textEntered
         }, {
@@ -124,6 +135,23 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
             })
             .catch(err => {
                 console.error(err)
+            })
+    }
+
+    function deleteThisComment() {
+        setOpenOptions(false)
+
+        axios.delete(`http://localhost:3001/posts/${postID}/comment/${comment._id}`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+            .then(res => {
+                console.log(res.data.deleted)
+                updateThisComment(null, index, true)
+            })
+            .catch(err => {
+                console.log(err)
             })
     }
 
@@ -150,7 +178,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
         const differenceInHours = Math.ceil((treatAsUTC(dateNow) - treatAsUTC(commentTimestamp)) / millisecondsPerHour)
 
         if (differenceInHours < 24) {
-            setLastEdited(differenceInHours + (differenceInHours === 1 ? " hour ago" : " /likehours ago"))
+            setLastEdited(differenceInHours + (differenceInHours === 1 ? " hour ago" : " hours ago"))
             return
         }
 
@@ -208,7 +236,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                                 <p><i>Edited</i></p>
                             }
                         </div>
-                        <div className={classes.comment}>{comment.comment}</div>
+                        <div className={classes.comment}><p>{comment.comment}</p></div>
                     </div>
                 </div>
                 <div className={classes.commentControl}>
@@ -227,7 +255,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                         {openOptions &&
                             <div ref={modalRef} className={classes.optionsContainerContent}>
                                 <p onClick={() => setEditing(true)}>Edit Comment</p>
-                                <p>Delete Comment</p>
+                                <p onClick={deleteThisComment}>Delete Comment</p>
                             </div>
                         }
                         {comment.isAuthor === true &&
