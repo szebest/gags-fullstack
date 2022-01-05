@@ -453,8 +453,6 @@ app.patch('/posts/:postID/comment/:commentID/edit', authenticateToken, async (re
     const updatedCommentText = req.body.comment
     const username = req.username
 
-    console.log(updatedCommentText)
-
     try {
         const postWithUpdatedComment = await Posts.findById(postID).lean()
 
@@ -507,13 +505,56 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
         found.comments[0].likes = 0
         found.comments[0].dislikes = 0
 
-        const updatedPost = await Posts.findByIdAndUpdate(postID, found, { new: true })
+        const updatedPost = await Posts.findByIdAndUpdate(postID, found, { new: true }).lean()
+
+        updatedPost.comments[0].isAuthor = true
 
         return res.status(200).send({ comment: updatedPost.comments[0] })
     }
     catch (err) {
         console.log(err)
         return res.sendStatus(400)
+    }
+})
+
+app.delete('/posts/:postID/comment/:commentID', authenticateToken, async (req, res) => {
+    const postID = req.params.postID
+    const commentID = req.params.commentID
+    const username = req.username
+
+    try {
+        const foundPost = await Posts.findById(postID).lean()
+
+        const foundAuthor = await User.findOne({ username }).lean()
+
+        const allUsers = await User.find({}).lean()
+
+        const foundCommentIdToBeDeleted = foundPost.comments.findIndex((comment) => {
+            return comment._id.toString() === mongoose.Types.ObjectId(commentID).toString()
+        })
+
+        if (foundCommentIdToBeDeleted < 0) return res.status(400)
+
+        if (foundAuthor._id.toString() !== foundPost.comments[foundCommentIdToBeDeleted].userId.toString()) return res.status(403)
+
+        const deleted = foundPost.comments.splice(foundCommentIdToBeDeleted, 1)
+
+        await Posts.findByIdAndUpdate(postID, foundPost)
+
+        allUsers.forEach(async (singleUser) => {
+            const filtered = singleUser.commentsLiked.filter((commentLiked) => {
+                return commentLiked.commentId.toString() !== mongoose.Types.ObjectId(commentID).toString()
+            })
+            singleUser.commentsLiked = filtered
+
+            await User.findByIdAndUpdate(singleUser._id, singleUser)
+        })
+
+        return res.status(200).json({deleted: deleted[0]})
+    }
+    catch(err) {
+        console.log(err)
+        return res.status(400)
     }
 })
 
