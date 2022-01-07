@@ -43,6 +43,10 @@ const postCommentRelationSchema = new mongoose.Schema({
 })
 
 const postsSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
     author: {
         type: String,
         required: true

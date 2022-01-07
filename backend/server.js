@@ -183,18 +183,20 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
 
     const fileSrc = await uploadFile(file.mimetype, file.originalname, req.file.buffer, '1oDggHkUemf4ONbSk9SqKh4Lq1dPc5W-D')
 
-    const post = new Posts({
-        author: username,
-        title,
-        section,
-        imgSrc: fileSrc,
-        comments: []
-    })
-
     try {
-        const newPost = await post.save()
 
-        const user = (await User.find({ username }))[0]
+        const user = await User.findOne({ username })
+
+        const post = new Posts({
+            userId: user._id,
+            author: username,
+            title,
+            section,
+            imgSrc: fileSrc,
+            comments: []
+        })
+
+        const newPost = await post.save()
 
         user.postsCreated.unshift({})
         user.postsCreated[0].postId = newPost._id
@@ -514,6 +516,63 @@ app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
     catch (err) {
         console.log(err)
         return res.sendStatus(400)
+    }
+})
+
+app.delete('/posts/:postID', authenticateToken, async (req, res) => {
+    const postID = req.params.postID
+    const username = req.username
+
+    try {
+        const foundPost = await Posts.findById(postID).lean()
+
+        if (foundPost === null) return res.status(400)
+
+        const foundAuthor = await User.findOne({ username }).lean()
+
+        if (foundAuthor._id.toString() !== foundPost.userId.toString()) return res.status(403)
+
+        const allUsers = await User.find({}).lean()
+
+        const comments = foundPost.comments
+
+        await Posts.findByIdAndRemove(postID)
+
+        allUsers.forEach(async (singleUser) => {
+            comments.forEach((comment) => {
+                const filteredCommentsLiked = singleUser.commentsLiked.filter((commentLiked) => {
+                    return commentLiked.commentId.toString() !== comment._id.toString()
+                })
+                singleUser.commentsLiked = filteredCommentsLiked
+            })
+
+            const filteredCommentsLiked = singleUser.commentsLiked.filter((commentLiked) => {
+                return !!(comments.find((comment) => {
+                    return commentLiked.commentId.toString() !== comment._id.toString()
+                }))
+            })
+            singleUser.commentsLiked = filteredCommentsLiked
+
+            const filteredPostsLiked = singleUser.postsLiked.filter((postLiked) => {
+                return postLiked.postId.toString() !== mongoose.Types.ObjectId(postID).toString()
+            })
+
+            singleUser.postsLiked = filteredPostsLiked
+
+            const filteredPostsCreated = singleUser.postsLiked.filter((postCreated) => {
+                return postCreated.postId.toString() !== mongoose.Types.ObjectId(postID).toString()
+            })
+
+            singleUser.postsCreated = filteredPostsCreated
+
+            await User.findByIdAndUpdate(singleUser._id, singleUser)
+        })
+
+        return res.status(200).json({deleted: foundPost})
+    }
+    catch(err) {
+        console.log(err)
+        return res.status(400)
     }
 })
 

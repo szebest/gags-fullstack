@@ -81,7 +81,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhY
 ###
 POST http://localhost:3001/posts/6150bb3bde9f22c59d19119d/comment
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWEiLCJpYXQiOjE2MzM4MDQzOTIsImV4cCI6MTYzMzgwNTI5Mn0.a4cPuUy26WJV5y3Tx9l5B7kQFWfIOn1XH5ItjWggAis
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWFhYSIsImlhdCI6MTY0MTU5MDY3NywiZXhwIjoxNjQxNTkyNDc3fQ.KB0ecqTvL7TYKqZ5w2af8xNNCDylmb9mFPAiYa0IxXU
 
 {
     "comment": "XD"
@@ -94,3 +94,8 @@ Content-Type: application/json
 ###
 
 PATCH http://localhost:3001/posts/61cb7b4961162b722603460c/comment/61cc22f589b229b7a9d2bbaf
+
+###
+DELETE http://localhost:3001/posts/61d8b1780c7c996d6affeaed
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWFhYSIsImlhdCI6MTY0MTU5MDY3NywiZXhwIjoxNjQxNTkyNDc3fQ.KB0ecqTvL7TYKqZ5w2af8xNNCDylmb9mFPAiYa0IxXU
