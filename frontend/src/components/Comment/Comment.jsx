@@ -147,7 +147,6 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
             }
         })
             .then(res => {
-                console.log(res.data.deleted)
                 updateThisComment(null, index, true)
             })
             .catch(err => {

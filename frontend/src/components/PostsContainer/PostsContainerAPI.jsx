@@ -10,10 +10,16 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const [postsAvailable, setPostsAvailable] = useState(true)
     const [posts, setPosts] = useState([])
 
-    function updatePost(updatedPost, index) {
+    function updatePost(updatedPost, index, shouldBeDeleted) {
         const tmpPosts = posts
-        tmpPosts[index] = updatedPost
-        setPosts([...tmpPosts])
+        if (shouldBeDeleted === true) {
+            tmpPosts.splice(index, 1)
+            setPosts([...tmpPosts])
+        }
+        else {
+            tmpPosts[index] = updatedPost
+            setPosts([...tmpPosts])
+        }
     }
 
     useEffect(() => {

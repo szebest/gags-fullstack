@@ -14,6 +14,9 @@ function Post({ post, saveInLS, updatePost, index }) {
     const [tmpAction, tmpSetAction] = useState(action)
     const hasAccess = useSelector(state => state.hasAccess)
     const imageRef = useRef()
+    const [openOptions, setOpenOptions] = useState(false)
+    const optionsRef = useRef()
+    const modalRef = useRef()
 
     const [commentClicked, setCommentClicked] = useState(false)
     const [redirectTo, setRedirectTo] = useState("")
@@ -103,25 +106,57 @@ function Post({ post, saveInLS, updatePost, index }) {
         setAction({...tmpState})
     }
 
+    const handleClick = (e) => {
+        if (!openOptions && optionsRef.current && modalRef.current && !optionsRef.current.contains(e.target) && !modalRef.current.contains(e.target)) {
+            setOpenOptions(false)
+        }
+    }
+
+    useEffect(() => {
+        document.body.addEventListener('click', handleClick)
+
+        return () => {
+            document.body.removeEventListener('click', handleClick)
+        }
+    }, [])
+
+    function deleteThisPost() {
+        setOpenOptions(false)
+
+        axios.delete(`http://localhost:3001/posts/${post._id}`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+            .then(res => {
+                updatePost(null, index, true)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
     if (commentClicked) {
         return <Redirect to={redirectTo} />
     }
 
     return (
         <div className={classes.postWrapper}>
-            <Link to={redirectTo}>
+            <div className={classes.content}>
+                <Link to={redirectTo}>
+                    <div className={classes.center}>
+                        <h2>{post.title}</h2>
+                    </div>
+                </Link>
                 <div className={classes.center}>
-                    <h2>{post.title}</h2>
+                    <h6>Posted in {post.section} by {post.author}</h6>
                 </div>
-            </Link>
-            <div className={classes.center}>
-                <h6>Posted in {post.section} by {post.author}</h6>
+                <Link className={classes.fullWidth} to={redirectTo}>
+                    <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
+                        <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
+                    </div>
+                </Link>
             </div>
-            <Link className={classes.fullWidth} to={redirectTo}>
-                <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
-                    <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
-                </div>
-            </Link>
             <div className={classes.statistics}>
                 <div className={action.like ? classes.clicked : ""} onClick={like}>
                     <p>▲</p>
@@ -138,6 +173,21 @@ function Post({ post, saveInLS, updatePost, index }) {
                     <p>💬</p>
                     <p>{post.commentsAmount}</p>
                 </div>
+                <span className={classes.relativeWrapper}>
+                    {openOptions &&
+                        <div ref={modalRef} className={classes.optionsContainerContent}>
+                            <p onClick={() => { }}>Edit Post</p>
+                            <p onClick={deleteThisPost}>Delete Post</p>
+                        </div>
+                    }
+                    <div className={classes.statistics}>
+                        <div ref={optionsRef} className={classes.options} onClick={() => setOpenOptions(prev => !prev)}>
+                            <div className={classes.optionsContainerStyle}></div>
+                            <div className={classes.optionsContainerStyle}></div>
+                            <div className={classes.optionsContainerStyle}></div>
+                        </div>
+                    </div>
+                </span>
             </div>
         </div>
     );
