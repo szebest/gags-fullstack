@@ -423,7 +423,8 @@ app.get('/posts', checkToken, async (req, res) => {
 
     try {
         const posts = section === 'undefined' ? await Posts.find().lean() : await Posts.find({ section }).lean()
-        const userLikedPosts = username ? (await User.findOne({ username })).postsLiked : []
+        const user = await User.findOne({ username })
+        const userLikedPosts = user ? user.postsLiked : []
 
         const slicedPosts = posts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts).map((slicedPost) => {
             userLikedPosts.forEach((likedPost) => {
@@ -433,6 +434,10 @@ app.get('/posts', checkToken, async (req, res) => {
 
             slicedPost.commentsAmount = slicedPost.comments.length
             delete slicedPost.comments
+
+            if (user._id.toString() === slicedPost.userId.toString()) {
+                slicedPost.isAuthor = true
+            }
 
             return slicedPost
         })
@@ -513,6 +518,10 @@ app.patch('/posts/:postID/edit', authenticateToken, async (req, res) => {
         postToBeUpdated.created = Date.now()
 
         await Posts.findByIdAndUpdate(postID, postToBeUpdated)
+
+        postToBeUpdated.isAuthor = true
+
+        postToBeUpdated.commentsAmount = postToBeUpdated.comments.length
 
         delete postToBeUpdated.comments
 
@@ -750,12 +759,18 @@ app.get('/posts/:id', checkToken, async (req, res) => {
     try {
         const found = await Posts.findById(postID).lean()
 
+        const user = await User.findOne({username})
+
         if (username !== undefined) {
             const foundUser = await User.findOne({ username })
 
             const foundUserIndex = foundUser.postsLiked.findIndex((postLiked) => {
                 return postLiked.postId && postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
             })
+
+            if (user._id.toString() === found.userId.toString()) {
+                found.isAuthor = true
+            }
 
             if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType
         }
@@ -889,6 +904,10 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
         updatedPost.commentsAmount = updatedPost.comments.length
 
         delete updatedPost.comments
+
+        if (foundUser._id.toString() === updatedPost.userId.toString()) {
+            updatedPost.isAuthor = true
+        }
 
         /////////////////////////////
 

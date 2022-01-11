@@ -241,13 +241,15 @@ function Post({ post, saveInLS, updatePost, index }) {
                             <p onClick={deleteThisPost}>Delete Post</p>
                         </div>
                     }
-                    <div className={classes.statistics}>
-                        <div ref={optionsRef} className={classes.options} onClick={() => setOpenOptions(prev => !prev)}>
-                            <div className={classes.optionsContainerStyle}></div>
-                            <div className={classes.optionsContainerStyle}></div>
-                            <div className={classes.optionsContainerStyle}></div>
+                    {post && post.isAuthor &&
+                        <div className={classes.statistics}>
+                            <div ref={optionsRef} className={classes.options} onClick={() => setOpenOptions(prev => !prev)}>
+                                <div className={classes.optionsContainerStyle}></div>
+                                <div className={classes.optionsContainerStyle}></div>
+                                <div className={classes.optionsContainerStyle}></div>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </span>
             </div>
         </div>
