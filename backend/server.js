@@ -484,6 +484,46 @@ app.patch('/posts/:postID/comment/:commentID/edit', authenticateToken, async (re
     }
 })
 
+app.patch('/posts/:postID/edit', authenticateToken, async (req, res) => {
+    const postID = req.params.postID
+    const updatedTitle = req.body.title
+    const username = req.username
+
+    try {
+        const postToBeUpdated = await Posts.findById(postID).lean()
+
+        if (postToBeUpdated.comments === null) {
+            return res.status(404)
+        }
+
+        const user = await User.findOne({ username })
+
+        if (postToBeUpdated.comments === null) {
+            return res.status(404)
+        }
+
+        if (postToBeUpdated.userId.toString() !== user._id.toString()) {
+            return res.status(400)
+        }
+
+        postToBeUpdated.title = updatedTitle
+
+        postToBeUpdated.edited = true
+
+        postToBeUpdated.created = Date.now()
+
+        await Posts.findByIdAndUpdate(postID, postToBeUpdated)
+
+        delete postToBeUpdated.comments
+
+        return res.status(200).json({ updatedPost: postToBeUpdated })
+    }
+    catch(err) {
+        console.log(err)
+        return res.status(400)
+    }
+})
+
 app.post('/posts/:id/comment', authenticateToken, async (req, res) => {
     const postID = req.params.id
     const comment = req.body.comment

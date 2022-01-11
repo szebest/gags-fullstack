@@ -84,6 +84,10 @@ const postsSchema = new mongoose.Schema({
         required: true,
         default: 1
     },
+    edited: {
+        type: Boolean,
+        required: false
+    },
     comments: [postCommentRelationSchema]
 })
 
