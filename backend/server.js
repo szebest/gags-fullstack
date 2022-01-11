@@ -435,7 +435,7 @@ app.get('/posts', checkToken, async (req, res) => {
             slicedPost.commentsAmount = slicedPost.comments.length
             delete slicedPost.comments
 
-            if (user._id.toString() === slicedPost.userId.toString()) {
+            if (user && user._id.toString() === slicedPost.userId.toString()) {
                 slicedPost.isAuthor = true
             }
 
@@ -759,16 +759,14 @@ app.get('/posts/:id', checkToken, async (req, res) => {
     try {
         const found = await Posts.findById(postID).lean()
 
-        const user = await User.findOne({username})
-
         if (username !== undefined) {
-            const foundUser = await User.findOne({ username })
+            const user = await User.findOne({username})
 
             const foundUserIndex = foundUser.postsLiked.findIndex((postLiked) => {
                 return postLiked.postId && postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
             })
 
-            if (user._id.toString() === found.userId.toString()) {
+            if (user && user._id.toString() === found.userId.toString()) {
                 found.isAuthor = true
             }
 
