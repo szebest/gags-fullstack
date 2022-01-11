@@ -20,6 +20,8 @@ function Post({ post, saveInLS, updatePost, index }) {
 
     const [commentClicked, setCommentClicked] = useState(false)
     const [redirectTo, setRedirectTo] = useState("")
+    const [editing, setEditing] = useState(false)
+    const [textEntered, setTextEntered] = useState("")
 
     useEffect(() => {
         setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
@@ -106,6 +108,40 @@ function Post({ post, saveInLS, updatePost, index }) {
         setAction({...tmpState})
     }
 
+    useEffect(() => {
+        if (editing === true) {
+            setTextEntered(post.title)
+        }
+        setOpenOptions(false)
+    }, [editing])
+
+    function sendUpdateRequest() {
+        var onlySpaces = true
+        textEntered.split('').forEach((char) => {
+            if (char !== ' ') onlySpaces = false
+        })
+
+        if (textEntered === post.title || onlySpaces) {
+            setEditing(false)
+            return
+        }
+
+        axios.patch(`http://localhost:3001/posts/${post._id}/edit`, {
+            title: textEntered
+        }, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
+            .then(res => {
+                updatePost(res.data.updatedPost, index)
+                setEditing(false)
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
+
     const handleClick = (e) => {
         if (!openOptions && optionsRef.current && modalRef.current && !optionsRef.current.contains(e.target) && !modalRef.current.contains(e.target)) {
             setOpenOptions(false)
@@ -138,6 +174,31 @@ function Post({ post, saveInLS, updatePost, index }) {
 
     if (commentClicked) {
         return <Redirect to={redirectTo} />
+    }
+
+    if (editing) {
+        return (
+            <div className={classes.postWrapper}>
+                <div className={classes.content}>
+                    <div className={classes.center}>
+                        <textarea className={classes.textarea} value={textEntered} onChange={(e) => setTextEntered(e.target.value)}></textarea>
+                    </div>
+                    <div className={classes.center}>
+                        <h6>Posted in {post.section} by {post.author}</h6>
+                    </div>
+                    <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
+                        <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
+                    </div>
+                </div>
+                <div className={classes.actionButtons}>
+                    <button onClick={() => {
+                        setEditing(false)
+                        sendUpdateRequest()
+                    }}>Edit</button>
+                    <button onClick={() => setEditing(false)}>Abort</button>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -176,7 +237,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                 <span className={classes.relativeWrapper}>
                     {openOptions &&
                         <div ref={modalRef} className={classes.optionsContainerContent}>
-                            <p onClick={() => { }}>Edit Post</p>
+                            <p onClick={() => setEditing(true)}>Edit Post</p>
                             <p onClick={deleteThisPost}>Delete Post</p>
                         </div>
                     }

@@ -26,6 +26,13 @@
     justify-content: center;
 }
 
+.textarea {
+    margin-top: 19.92px;
+    margin-bottom: 19.92px;
+    width: 90%;
+    resize: vertical;
+}
+
 .statistics {
     display: flex;
     flex-direction: row;
@@ -151,4 +158,17 @@
 .row {
     display: flex;
     flex-direction: row;
+}
+
+.actionButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 90%;
+
+    button {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 45%;
+    }
 }
