@@ -118,8 +118,8 @@ function RegisterSite() {
                     <div className={classes.error}>{error.confirm}</div>
                     <div className={classes.fileInputWrapper}>
                         {fileSrc.length > 0 &&
-                            <img height="100"
-                                width="100"
+                            <img height="80"
+                                width="80"
                                 src={fileSrc}
                                 alt="your image"
                                 className={classes.profile} />}

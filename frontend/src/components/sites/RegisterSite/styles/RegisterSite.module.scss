@@ -5,6 +5,10 @@
     max-width: 90%;
     margin-left: 5%;
     min-height: calc(100vh - 92px);
+
+    h1 {
+        margin: 0px 0px 10px 0px;
+    }
 }
 
 .mainContent {
@@ -149,24 +153,11 @@
     }
 }
 
-.loginNavigation {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    margin: 25px;
-
-    h1 {
-        align-self: center;
-        max-width: max-content;
-    }
-}
-
 .fileInputWrapper {
     display: flex;
     justify-content: center;
     align-content: center;
-    min-height: 100px;
+    min-height: 80px;
     margin: 10px 0px;
 
 	input {
