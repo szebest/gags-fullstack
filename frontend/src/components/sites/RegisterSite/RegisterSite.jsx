@@ -46,10 +46,9 @@ function RegisterSite() {
         if (file.length === 0)
             errors.file = "Provide your profile picture"
 
-        if (errors.username.length > 0 || errors.password.length > 0 || errors.confirm.length > 0 || errors.file.length > 0) {
-            setError(errors)
-            return
-        }
+        setError(errors)
+
+        if (errors.username.length > 0 || errors.password.length > 0 || errors.confirm.length > 0 || errors.file.length > 0) return
 
         const form = new FormData()
 
@@ -125,7 +124,7 @@ function RegisterSite() {
                                 alt="your image"
                                 className={classes.profile} />}
                         <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
-                        <label for="file">{fileName.length === 0 ? "Choose a profile picture" : fileName}</label>
+                        <label htmlFor="file">{fileName.length === 0 ? "Choose a profile picture" : fileName}</label>
                     </div>
                     <div className={classes.error}>{error.file}</div>
                     <div className={classes.submit}>
