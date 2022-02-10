@@ -17,6 +17,7 @@
     img {
         max-height: 500px;
     }
+    padding-top: 25px;
 }
 
 @media only screen and (max-width: 900px) {
@@ -55,7 +56,7 @@
     right: 0;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 10000;
-    cursor: default;
+    cursor: pointer;
 }
 
 .postsContainerWrapper {
@@ -71,4 +72,29 @@
 .limitSpace {
     width: 80%;
     min-height: 100%;
+}
+
+.absoluteButton {
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+
+    top: 2.5px;
+    right: 2.5px;
+
+    border: 1px solid black;
+
+    width: 20px;
+    height: 20px;
+
+    cursor: pointer;
+
+    p {
+        position: absolute;
+        top: -2px;
+        color: black;
+        text-decoration: inherit;
+        margin: 0px;
+    }
 }

@@ -7,11 +7,17 @@
     min-height: 100px;
     margin-bottom: 50px;
     width: 100%;
+
+    margin-top: 25px;
 }
 
 .limitSpace {
+    display: flex;
+    flex-direction: column;
     width: 80%;
     min-height: 100%;
+
+    gap: 10px;
 }
 
 .observer {

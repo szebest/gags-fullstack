@@ -1,52 +1,55 @@
 import classes from './styles/RegisterSite.module.scss'
 import { useRef, useState } from 'react';
 import axios from 'axios';
-import { Redirect } from 'react-router';
+import { Link, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 
 function RegisterSite() {
-    const usernameRef = useRef()
-    const passwordRef = useRef()
-    const confirmPasswordRef = useRef()
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
     const imageRef = useRef()
-    const [error, setError] = useState([])
+    const [error, setError] = useState({ username: "", password: "", confirm: "", file: "" })
     const [redirect, setRedirect] = useState(false)
     const [fileSrc, setFileSrc] = useState("")
+    const [fileName, setFileName] = useState("")
     const hasAccess = useSelector(state => state.hasAccess)
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
 
     if (redirect)
-        return <Redirect to={`/login?username=${usernameRef.current.value}`} />
+        return <Redirect to={`/login?username=${username}`} />
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        const username = usernameRef.current.value
-        const password = passwordRef.current.value
-        const confirmPassword = confirmPasswordRef.current.value
         const file = imageRef.current.files[0] ? imageRef.current.files[0].name : ""
-        const errors = []
+        const errors = { username: "", password: "", confirm: "", file: "" }
 
         if (username.length < 4)
-            errors.push("Username has to be at least 4 characters long")
+            errors.username = "Username has to be at least 4 characters long"
         else if (username.length > 15)
-            errors.push("Username has to be shorter than 15 characters")
+            errors.username = "Username has to be shorter than 15 characters"
 
         if (password.length < 4)
-            errors.push("Password has to be at least 6 characters long")
+            errors.password = "Password has to be at least 6 characters long"
         else if (password.length > 15)
-            errors.push("Password has to be shorter than 30 characters")
-        
+            errors.password = "Password has to be shorter than 30 characters"
+
         if (password !== confirmPassword)
-            errors.push("Passwords do not match")
-        
-        if (file.length === 0)
-            errors.push("Provide your profile picture")
-        
+            errors.confirm = "Passwords do not match"
+
         const extension = file.split('.')[1]
         if (!(file && (extension === 'jpg' || extension === 'png')))
-            errors.push("Profile picture must have an .jpg or .png extension")
+            errors.file = "Profile picture must have an .jpg or .png extension"
+
+        if (file.length === 0)
+            errors.file = "Provide your profile picture"
+
+        if (errors.username.length > 0 || errors.password.length > 0 || errors.confirm.length > 0 || errors.file.length > 0) {
+            setError(errors)
+            return
+        }
 
         const form = new FormData()
 
@@ -54,24 +57,18 @@ function RegisterSite() {
         form.append("password", password)
         form.append("file", imageRef.current.files[0])
 
-        //Successfully filled out form, no errors
-        if (errors.length === 0) {
-            axios({
-                method: "POST",
-                url: "http://localhost:3001/register",
-                data: form,
-                headers: { "Content-Type": "multipart/form-data" }
-            })
+        axios({
+            method: "POST",
+            url: "http://localhost:3001/register",
+            data: form,
+            headers: { "Content-Type": "multipart/form-data" }
+        })
             .then(res => {
                 setRedirect(true)
             })
             .catch(err => {
-                //setError([err])
+                setError(prev => {return {...prev, username: "This username is taken, please choose another one!"}})
             })
-        }
-        else {
-            setError(errors)
-        }
     }
 
     const handleImageChange = () => {
@@ -81,14 +78,14 @@ function RegisterSite() {
             const filePath = URL.createObjectURL(imageRef.current.files[0])
 
             if (filePath) {
+                setFileName(imageRef.current.files[0].name.split('\\').pop().split('/').pop())
                 setFileSrc(filePath)
                 return
             }
         }
-        setFileSrc("")
     }
 
-    if (hasAccess === null) 
+    if (hasAccess === null)
         return (
             <>
             </>
@@ -96,28 +93,55 @@ function RegisterSite() {
 
     return (
         <div className={classes.registerSiteWrapper}>
-            <div className={classes.errorContainer}>
-                {error.map((err, index) => 
-                    <div key={index}>
-                        <center><p>{err}</p></center>
+            <div className={classes.mainContent}>
+                <h1>Create an account</h1>
+                <form onSubmit={handleSubmit} className={classes.registerSiteForm}>
+                    <div className={classes.inputData}>
+                        <div className={`${classes.inputDataWrapper} ${error.username.length > 0 ? classes.errorInput : ""}`}>
+                            <input className={username.length > 0 ? classes.hasValue : ""} onChange={(e) => setUsername(e.target.value)} type="text" />
+                            <label>Username</label>
+                        </div>
                     </div>
-                )}
+                    <div className={classes.error}>{error.username}</div>
+                    <div className={classes.inputData}>
+                        <div className={`${classes.inputDataWrapper} ${error.password.length > 0 ? classes.errorInput : ""}`}>
+                            <input className={password.length > 0 ? classes.hasValue : ""} onChange={(e) => setPassword(e.target.value)} type="password" />
+                            <label>Password</label>
+                        </div>
+                    </div>
+                    <div className={classes.error}>{error.password}</div>
+                    <div className={classes.inputData}>
+                        <div className={`${classes.inputDataWrapper} ${error.confirm.length > 0 ? classes.errorInput : ""}`}>
+                            <input className={confirmPassword.length > 0 ? classes.hasValue : ""} onChange={(e) => setConfirmPassword(e.target.value)} type="password" />
+                            <label>Confirm password</label>
+                        </div>
+                    </div>
+                    <div className={classes.error}>{error.confirm}</div>
+                    <div className={classes.fileInputWrapper}>
+                        {fileSrc.length > 0 &&
+                            <img height="100"
+                                width="100"
+                                src={fileSrc}
+                                alt="your image"
+                                className={classes.profile} />}
+                        <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
+                        <label for="file">{fileName.length === 0 ? "Choose a profile picture" : fileName}</label>
+                    </div>
+                    <div className={classes.error}>{error.file}</div>
+                    <div className={classes.submit}>
+                        <div className={classes.submitWrapper}><input type="submit" value="Submit" /></div>
+                    </div>
+                </form>
             </div>
-            <form onSubmit={handleSubmit} className={classes.registerSiteForm}>
-                <input ref={usernameRef} type="text" placeholder="Username" />
-                <input ref={passwordRef} type="password" placeholder="Password" />
-                <input ref={confirmPasswordRef} type="password" placeholder="Confirm password" />
-                <div>
-                    {fileSrc.length > 0 && 
-                    <img height="48"
-                        width="48"
-                        src={fileSrc} 
-                        alt="your image"
-                        className={classes.profile} />}
-                    <input ref={imageRef} type="file" accept=".jpg,.png" onChange={handleImageChange} />
-                </div>
-                <input type="submit" value="Submit" />
-            </form>
+            <div className={classes.loginNavigation}>
+                <h1>Already have an account?</h1>
+                <p>Click here to log in!</p>
+                <Link to="/login">
+                    <div className={classes.submit}>
+                        <div className={classes.submitWrapper}><input type="submit" value="Login" /></div>
+                    </div>
+                </Link>
+            </div>
         </div>
     );
 }

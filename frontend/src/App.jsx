@@ -52,7 +52,7 @@ function App() {
         if (accessToken !== 'undefined') {
             sendRefreshRequest()
             const str = Cookies.get('expiresIn')
-            if (str !== 'undefined') {
+            if (str !== undefined) {
                 const number = parseInt(str, 10)
                 const unit = str.substr(number.toString().length)
                 const multiplier = unit === 's' ? 1000 :

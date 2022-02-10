@@ -51,13 +51,20 @@ export default function PostModal() {
 
     if (postID === undefined) return null
 
+    const locateBack = window.location.pathname.split('/').reduce((previous, current, index, array) => {
+        if (index + 2 < array.length) return previous + '/' + current
+        else return previous
+    })
+
     return ReactDom.createPortal(
         <>
-            <Link to={window.location.pathname.split('/').reduce((previous, current, index, array) => {
-                if (index + 2 < array.length) return previous + '/' + current
-                else return previous
-            })} className={`${classes.overlay} ${classes.fadeIn}`}></Link>
+            <Link to={locateBack} className={`${classes.overlay} ${classes.fadeIn}`}></Link>
             {post && <div className={`${classes.modalWrapper} ${classes.fadeIn}`}>
+                <Link to={locateBack}>
+                    <div className={classes.absoluteButton}>
+                        <p>X</p>
+                    </div>
+                </Link>
                 <Scrollbars
                     autoHide
                     autoHideTimeout={500}
