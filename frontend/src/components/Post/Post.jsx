@@ -205,7 +205,7 @@ function Post({ post, saveInLS, updatePost, index }) {
         <div className={classes.postWrapper}>
             <div className={classes.content}>
                 <Link to={redirectTo}>
-                    <div className={classes.center}>
+                    <div className={`${classes.center} ${classes.marginLeftRight}`}>
                         <h2>{post.title}</h2>
                     </div>
                 </Link>
