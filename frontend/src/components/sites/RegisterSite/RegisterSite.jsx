@@ -23,7 +23,7 @@ function RegisterSite() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        const file = imageRef.current.files[0] ? imageRef.current.files[0].name : ""
+        const file = (fileName.length > 0 && imageRef.current.files[0]) ? imageRef.current.files[0].name : ""
         const errors = { username: "", password: "", confirm: "", file: "" }
 
         if (username.length < 4)
@@ -84,6 +84,12 @@ function RegisterSite() {
         }
     }
 
+    const handleImageError = () => {
+        setFileSrc("")
+        setFileName("")
+        setError(prev => { return {...prev, file: "Provide a valid image file!"} })
+    }
+
     if (hasAccess === null)
         return (
             <>
@@ -121,7 +127,9 @@ function RegisterSite() {
                             <img height="80"
                                 width="80"
                                 src={fileSrc}
-                                alt="your image"
+                                alt="profile picture"
+                                onLoad={() => setError(prev => { return {...prev, file: ""} })}
+                                onError={handleImageError}
                                 className={classes.profile} />}
                         <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
                         <label htmlFor="file">{fileName.length === 0 ? "Choose a profile picture" : fileName}</label>
