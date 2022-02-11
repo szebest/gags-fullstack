@@ -10,10 +10,12 @@ function UploadSite() {
     const sectionRef = useRef()
     const [title, setTitle] = useState("")
     const [fileSrc, setFileSrc] = useState("")
+    const [fileName, setFileName] = useState("")
     const [redirect, setRedirect] = useState(false)
     const [submitClicked, setSubmitClicked] = useState(false)
     const [sections, setSections] = useState([])
     const hasAccess = useSelector(state => state.hasAccess)
+    const [error, setError] = useState({ title: "", file: "" })
 
     useEffect(() => {
         let cancel
@@ -32,11 +34,22 @@ function UploadSite() {
 
     const HandleSubmit = async (e) => {
         e.preventDefault()
+        const file = (fileName.length > 0 && imageRef.current.files[0]) ? imageRef.current.files[0].name : ""
 
         if (hasAccess) {
             setSubmitClicked(true)
 
-            if (title.length === 0 || imageRef.current.files[0] === undefined) {
+            const errors = { title: "", file: "" }
+
+            if (file.length === 0)
+                errors.file = "Provide an image"
+
+            if (title.length === 0) 
+                errors.title = "Provide an title for the image"
+
+            setError(errors)
+
+            if (errors.title.length > 0 || errors.title.length > 0) {
                 setSubmitClicked(false)
                 return
             }
@@ -74,10 +87,16 @@ function UploadSite() {
 
             if (filePath) {
                 setFileSrc(filePath)
+                setFileName(imageRef.current.files[0].name.split('\\').pop().split('/').pop())
                 return
             }
         }
+    }
+
+    const handleImageError = () => {
         setFileSrc("")
+        setFileName("")
+        setError(prev => { return {...prev, file: "Provide a valid image file!"} })
     }
 
     if (hasAccess === null) 
@@ -89,19 +108,34 @@ function UploadSite() {
     return (
         <div className={classes.uploadSiteWrapper}>
             <div className={classes.imagePreview}>
-                <h2>{title}</h2>
-                <img src={fileSrc} alt="image preview" hidden={fileSrc.length === 0} />
+                <h2 className={classes.minHeight}>{title}</h2>
+                {fileSrc.length > 0 && <img src={fileSrc} alt="image preview" hidden={fileSrc.length === 0} onError={handleImageError} />}
             </div>
             <div className={classes.formContainer}>
                 <form className={classes.form} onSubmit={HandleSubmit}>
-                    <input type="text" placeholder="" value={title} onChange={(e) => setTitle(e.target.value)} />
-                    <select ref={sectionRef}>
-                        {sections && sections.map((section, index) => 
-                            <option key={section}>{section}</option>
-                        )}
-                    </select>
-                    <input ref={imageRef} type="file" accept=".jpg,.png" onChange={handleImageChange} />
-                    <input type="submit" value="Submit" disabled={submitClicked} />
+                    <div className={classes.inputData}>
+                        <div className={classes.inputDataWrapper}>
+                            <input className={title.length > 0 ? classes.hasValue : ""} type="text" value={title} onChange={(e) => setTitle(e.target.value)}/>
+                            <label>Post title</label>
+                        </div>
+                    </div>
+                    <div className={classes.error}>{error.title}</div>
+                    <div className={classes.selectData}>
+                        <label>Category</label>
+                        <select ref={sectionRef}>
+                            {sections && sections.map((section, index) => 
+                                <option key={section}>{section}</option>
+                            )}
+                        </select>
+                    </div>
+                    <div className={classes.fileInputWrapper}>
+                        <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
+                        <label htmlFor="file">{fileName.length === 0 ? "Choose an image" : fileName}</label>
+                    </div>
+                    <div className={classes.error}>{error.file}</div>
+                    <div className={classes.submit}>
+                        <div className={classes.submitWrapper}><input type="submit" value="Submit" disabled={submitClicked} /></div>
+                    </div>
                 </form>
             </div>
         </div>
