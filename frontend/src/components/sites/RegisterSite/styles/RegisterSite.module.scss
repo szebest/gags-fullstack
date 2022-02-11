@@ -72,7 +72,7 @@
     label {
         position: absolute;
         bottom: 15px;
-        left: 5px;
+        left: 1%;
         color: grey;
         pointer-events: none;
 
@@ -201,7 +201,7 @@
     color: red;
     max-width: 88%;
     margin-left: 6%;
-    margin-bottom: 5px;
+    transform: translateY(-5px);
 }
 
 .loginNavigation {
