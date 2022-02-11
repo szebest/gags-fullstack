@@ -4,6 +4,8 @@ import axios from 'axios'
 import { Redirect, Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
+import show from '../../../assets/show.svg'
+import hide from '../../../assets/hide.svg'
 
 function LoginSite() {
     const queryParam = new URLSearchParams(document.location.search).get("username")
@@ -12,6 +14,7 @@ function LoginSite() {
     const [error, setError] = useState("")
     const [, setLoading] = useState(false)
     const hasAccess = useSelector(state => state.hasAccess)
+    const [showPassword, setShowPassword] = useState(false)
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
@@ -59,9 +62,11 @@ function LoginSite() {
                     </div>
                     <div className={classes.inputData}>
                         <div className={classes.inputDataWrapper}>
-                            <input className={passwordState.length > 0 ? classes.hasValue : ""} type="password" value={passwordState} onChange={(e) => setPasswordState(e.target.value)}/>
+                            <input className={passwordState.length > 0 ? classes.hasValue : ""} type={showPassword ? "text" : "password"} value={passwordState} onChange={(e) => setPasswordState(e.target.value)}/>
                             <label>Password</label>
-                            <div className={classes.toggleVisibility}></div>
+                            <div className={classes.showPassword} onClick={() => setShowPassword(prev => !prev)}>
+                                <img width="30px" height="30px" src={showPassword ? hide : show} alt="show hide" />
+                            </div>
                         </div>
                     </div>
                     <div className={classes.submit}>

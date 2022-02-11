@@ -3,6 +3,8 @@ import { useRef, useState } from 'react';
 import axios from 'axios';
 import { Link, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux'
+import show from '../../../assets/show.svg'
+import hide from '../../../assets/hide.svg'
 
 function RegisterSite() {
     const [username, setUsername] = useState("")
@@ -14,6 +16,8 @@ function RegisterSite() {
     const [fileSrc, setFileSrc] = useState("")
     const [fileName, setFileName] = useState("")
     const hasAccess = useSelector(state => state.hasAccess)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
@@ -110,15 +114,21 @@ function RegisterSite() {
                     <div className={classes.error}>{error.username}</div>
                     <div className={classes.inputData}>
                         <div className={`${classes.inputDataWrapper} ${error.password.length > 0 ? classes.errorInput : ""}`}>
-                            <input className={password.length > 0 ? classes.hasValue : ""} onChange={(e) => setPassword(e.target.value)} type="password" />
+                            <input className={password.length > 0 ? classes.hasValue : ""} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} />
                             <label>Password</label>
+                            <div className={classes.showPassword} onClick={() => setShowPassword(prev => !prev)}>
+                                <img width="30px" height="30px" src={showPassword ? hide : show} alt="show hide" />
+                            </div>
                         </div>
                     </div>
                     <div className={classes.error}>{error.password}</div>
                     <div className={classes.inputData}>
                         <div className={`${classes.inputDataWrapper} ${error.confirm.length > 0 ? classes.errorInput : ""}`}>
-                            <input className={confirmPassword.length > 0 ? classes.hasValue : ""} onChange={(e) => setConfirmPassword(e.target.value)} type="password" />
+                            <input className={confirmPassword.length > 0 ? classes.hasValue : ""} onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} />
                             <label>Confirm password</label>
+                            <div className={classes.showPassword} onClick={() => setShowConfirmPassword(prev => !prev)}>
+                                <img width="30px" height="30px" src={showConfirmPassword ? hide : show} alt="show hide" />
+                            </div>
                         </div>
                     </div>
                     <div className={classes.error}>{error.confirm}</div>

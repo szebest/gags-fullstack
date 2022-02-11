@@ -52,6 +52,14 @@
         align-self: center;
     }
 
+    .showPassword {
+        position: absolute;
+        cursor: pointer;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
     input {
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         height: 100%;
@@ -65,13 +73,13 @@
         transition: 1s all ease;
 
         &:valid.hasValue ~ label, &:focus ~ label {
-            transform: translateY(-38px);
+            transform: translateY(-36px);
         }
     }
 
     label {
         position: absolute;
-        bottom: 15px;
+        bottom: 17px;
         left: 1%;
         color: grey;
         pointer-events: none;
