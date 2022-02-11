@@ -34,14 +34,13 @@ function UploadSite() {
 
     const HandleSubmit = async (e) => {
         e.preventDefault()
-        const file = (fileName.length > 0 && imageRef.current.files[0]) ? imageRef.current.files[0].name : ""
 
         if (hasAccess) {
             setSubmitClicked(true)
 
             const errors = { title: "", file: "" }
 
-            if (file.length === 0)
+            if (fileName.length === 0)
                 errors.file = "Provide an image"
 
             if (title.length === 0) 
@@ -49,7 +48,7 @@ function UploadSite() {
 
             setError(errors)
 
-            if (errors.title.length > 0 || errors.title.length > 0) {
+            if (errors.title.length > 0 || errors.file.length > 0) {
                 setSubmitClicked(false)
                 return
             }
