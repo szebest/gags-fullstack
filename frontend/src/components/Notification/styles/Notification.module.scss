@@ -3,6 +3,9 @@
     position: relative;
     min-height: 50px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &:first-child {
         margin-top: 10px;
@@ -14,11 +17,8 @@
 }
 
 .notification {
-    display: block;
-    left: 5%;
     font-size: 1rem;
     font-weight: 400;
-    min-height: fit-content;
     width: 90%;
     display: flex;
     justify-content: center;
