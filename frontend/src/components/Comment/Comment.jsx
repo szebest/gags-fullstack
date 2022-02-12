@@ -6,7 +6,7 @@ import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-export default function Comment({ postID, comment, sendComment, updateThisComment, index }) {
+export default function Comment({ postID, comment, sendComment, updateThisComment, index, avatar }) {
     const [openReply, setOpenReply] = useState(false)
     const [openOptions, setOpenOptions] = useState(false)
     const [editing, setEditing] = useState(false)
@@ -19,24 +19,8 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
         dislike: comment.actionType === 'dislike' ? 1 : 0
     })
     const [tmpAction, tmpSetAction] = useState(action)
-    const [avatar, setAvatar] = useState(null)
 
     const hasAccess = useSelector(state => state.hasAccess)
-
-    useEffect(() => {
-        if (!comment) return
-
-        axios({
-            method: "GET",
-            url: `http://localhost:3001/user/avatar/${comment.author}`,
-        })
-            .then(res => {
-                setAvatar(res.data.imgSrc)
-            })
-            .catch(err => {
-                console.error(err)
-            })
-    }, [comment])
 
     useEffect(() => {
         if (!comment._id) return
