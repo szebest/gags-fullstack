@@ -762,7 +762,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
         if (username !== undefined) {
             const user = await User.findOne({username})
 
-            const foundUserIndex = foundUser.postsLiked.findIndex((postLiked) => {
+            const foundUserIndex = user.postsLiked.findIndex((postLiked) => {
                 return postLiked.postId && postLiked.postId.toString() === mongoose.Types.ObjectId(postID).toString()
             })
 
@@ -770,7 +770,7 @@ app.get('/posts/:id', checkToken, async (req, res) => {
                 found.isAuthor = true
             }
 
-            if (foundUserIndex >= 0) found.actionType = foundUser.postsLiked[foundUserIndex].actionType
+            if (foundUserIndex >= 0) found.actionType = user.postsLiked[foundUserIndex].actionType
         }
 
         found.commentsAmount = found.comments.length
