@@ -19,7 +19,7 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
 
         setPreviousComments(comments)
 
-        const avatarsCopy = avatars
+        const avatarsCopy = new Map(avatars)
         
         difference.forEach((comment) => {
             if (avatarsCopy.get(comment.author) !== undefined) return
@@ -39,9 +39,11 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
                 })
                     .then(res => {
                         avatarsCopy.set(key, res.data.imgSrc)
-                        resolve()
                     })
                     .catch(() => {
+
+                    })
+                    .finally(() => {
                         resolve()
                     })
             }))
@@ -52,8 +54,6 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
         }) 
     }, [comments])
 
-    console.log(avatars)
-
     return (
         <>
             {showNewComment &&
@@ -63,7 +63,7 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
             }
             <div className={classes.container}>
                 <div className={classes.commentWrapper}>
-                    {comments && comments.map((comment, index) => <Comment updateThisComment={updateComment} postID={postID === undefined ? comment.postId : postID} comment={comment} sendComment={sendComment} index={index} key={comment._id + avatars.get(comment.author)} avatar={avatars.get(comment.author)} />)}
+                    {comments && comments.map((comment, index) => <Comment updateThisComment={updateComment} postID={postID === undefined ? comment.postId : postID} comment={comment} sendComment={sendComment} index={index} key={comment._id} avatar={avatars.get(comment.author)} />)}
                 </div>
             </div>
             <div className={classes.observer} ref={observeRef} >
