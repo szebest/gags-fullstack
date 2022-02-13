@@ -45,6 +45,10 @@
     resize: vertical;
 }
 
+.noPointer {
+    cursor: default !important;
+}
+
 .statistics {
     display: flex;
     flex-direction: row;

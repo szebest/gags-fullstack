@@ -227,10 +227,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                     <p>▼</p>
                     <p>{post.dislikes}</p>
                 </div>
-                <div onClick={(e) => {
-                    e.preventDefault()
-                    if (saveInLS === undefined) setCommentClicked(true)
-                }}>
+                <div className={classes.noPointer}>
                     <p>💬</p>
                     <p>{post.commentsAmount}</p>
                 </div>
