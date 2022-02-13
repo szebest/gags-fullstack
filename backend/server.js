@@ -221,7 +221,9 @@ app.get('/user/postsLiked', authenticateToken, async (req, res) => {
     const username = req.username
 
     try {
-        const userLikedPosts = (await User.findOne({ username }).lean()).postsLiked
+        const user = (await User.findOne({ username }).lean())
+
+        const userLikedPosts = user.postsLiked
 
         const slicedPosts = userLikedPosts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts)
 
@@ -230,6 +232,8 @@ app.get('/user/postsLiked', authenticateToken, async (req, res) => {
         for (const slicedPost of slicedPosts) {
             if (slicedPost.actionType !== "none") {
                 const post = await Posts.findById(slicedPost.postId).lean()
+
+                if (user._id.toString() === post.userId.toString()) post.isAuthor = true
 
                 post.actionType = slicedPost.actionType
                 post.commentsAmount = post.comments.length
@@ -257,9 +261,11 @@ app.get('/user/postsCreated', authenticateToken, async (req, res) => {
     const username = req.username
 
     try {
-        const userCreatedPosts = (await User.findOne({ username }).lean()).postsCreated
+        const user = (await User.findOne({ username }).lean())
 
-        const userLikedPosts = (await User.findOne({ username }).lean()).postsLiked
+        const userCreatedPosts = user.postsCreated
+
+        const userLikedPosts = user.postsLiked
 
         const slicedPosts = userCreatedPosts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts)
 
@@ -267,6 +273,8 @@ app.get('/user/postsCreated', authenticateToken, async (req, res) => {
 
         for (const slicedPost of slicedPosts) {
             const post = await Posts.findById(slicedPost.postId).lean()
+
+            if (user._id.toString() === post.userId.toString()) post.isAuthor = true
 
             userLikedPosts.forEach((likedPost) => {
                 if (likedPost.postId.toString() === slicedPost.postId.toString()) post.actionType = likedPost.actionType
@@ -314,7 +322,7 @@ app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
 
                         return true
                     })
-                    comment.isAuthor = true
+                    comments[0].isAuthor = true
                 }
             })
         })
