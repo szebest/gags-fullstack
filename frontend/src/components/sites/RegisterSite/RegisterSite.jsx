@@ -18,6 +18,7 @@ function RegisterSite() {
     const hasAccess = useSelector(state => state.hasAccess)
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [submitted, setSubmitted] = useState(false)
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
@@ -32,12 +33,12 @@ function RegisterSite() {
 
         if (username.length < 4)
             errors.username = "Username has to be at least 4 characters long"
-        else if (username.length > 15)
-            errors.username = "Username has to be shorter than 15 characters"
+        else if (username.length > 30)
+            errors.username = "Username has to be shorter than 30 characters"
 
         if (password.length < 4)
             errors.password = "Password has to be at least 6 characters long"
-        else if (password.length > 15)
+        else if (password.length > 30)
             errors.password = "Password has to be shorter than 30 characters"
 
         if (password !== confirmPassword)
@@ -60,6 +61,8 @@ function RegisterSite() {
         form.append("password", password)
         form.append("file", imageRef.current.files[0])
 
+        setSubmitted(true)
+
         axios({
             method: "POST",
             url: "http://localhost:3001/register",
@@ -71,6 +74,9 @@ function RegisterSite() {
             })
             .catch(err => {
                 setError(prev => {return {...prev, username: "This username is taken, please choose another one!"}})
+            })
+            .finally(() => {
+                setSubmitted(false)
             })
     }
 
@@ -146,7 +152,7 @@ function RegisterSite() {
                     </div>
                     <div className={classes.error}>{error.file}</div>
                     <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Submit" /></div>
+                        <div className={classes.submitWrapper}><input type="submit" value="Submit" disabled={submitted} /></div>
                     </div>
                 </form>
             </div>
