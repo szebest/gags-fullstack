@@ -215,13 +215,16 @@ app.get('/sections', (req, res) => {
     res.status(200).send({ sections: sections })
 })
 
-app.get('/user/postsLiked', authenticateToken, async (req, res) => {
+app.get('/user/postsLiked/:username', checkToken, async (req, res) => {
     const firstPost = parseInt(req.query.postNumber)
     const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
-    const username = req.username
+    const username = req.params.username
+    const usernameVisiting = req.username
 
     try {
         const user = (await User.findOne({ username }).lean())
+
+        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
 
         const userLikedPosts = user.postsLiked
 
@@ -233,9 +236,16 @@ app.get('/user/postsLiked', authenticateToken, async (req, res) => {
             if (slicedPost.actionType !== "none") {
                 const post = await Posts.findById(slicedPost.postId).lean()
 
-                if (user._id.toString() === post.userId.toString()) post.isAuthor = true
+                if (usernameVisiting === username && user._id.toString() === post.userId.toString()) post.isAuthor = true
 
-                post.actionType = slicedPost.actionType
+                if (userVisiting) {
+                    for (const userVisitingLikedPost of userVisiting.postsLiked) {
+                        if (post._id.toString() === userVisitingLikedPost.postId.toString()) {
+                            post.actionType = userVisitingLikedPost.actionType
+                        }
+                    }
+                }
+
                 post.commentsAmount = post.comments.length
                 delete post.comments
 
@@ -244,6 +254,7 @@ app.get('/user/postsLiked', authenticateToken, async (req, res) => {
         }
 
         const numberOfPostsLeft = Math.max(userLikedPosts.length - firstPost - amountOfReturnedPosts, 0)
+
         return res.status(200).json({
             posts,
             numberOfPostsLeft
@@ -255,17 +266,18 @@ app.get('/user/postsLiked', authenticateToken, async (req, res) => {
     }
 })
 
-app.get('/user/postsCreated', authenticateToken, async (req, res) => {
+app.get('/user/postsCreated/:username', checkToken, async (req, res) => {
     const firstPost = parseInt(req.query.postNumber)
     const amountOfReturnedPosts = parseInt(req.query.postsPerRequest)
-    const username = req.username
+    const username = req.params.username
+    const usernameVisiting = req.username
 
     try {
         const user = (await User.findOne({ username }).lean())
 
-        const userCreatedPosts = user.postsCreated
+        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
 
-        const userLikedPosts = user.postsLiked
+        const userCreatedPosts = user.postsCreated
 
         const slicedPosts = userCreatedPosts.reverse().slice(firstPost, firstPost + amountOfReturnedPosts)
 
@@ -274,11 +286,15 @@ app.get('/user/postsCreated', authenticateToken, async (req, res) => {
         for (const slicedPost of slicedPosts) {
             const post = await Posts.findById(slicedPost.postId).lean()
 
-            if (user._id.toString() === post.userId.toString()) post.isAuthor = true
+            if (userVisiting._id.toString() === post.userId.toString()) post.isAuthor = true
 
-            userLikedPosts.forEach((likedPost) => {
-                if (likedPost.postId.toString() === slicedPost.postId.toString()) post.actionType = likedPost.actionType
-            })
+            if (userVisiting) {
+                for (const userVisitingLikedPost of userVisiting.postsLiked) {
+                    if (slicedPost.postId.toString() === userVisitingLikedPost.postId.toString()) {
+                        post.actionType = userVisitingLikedPost.actionType
+                    }
+                }
+            }
 
             post.commentsAmount = post.comments.length
             delete post.comments
@@ -298,11 +314,14 @@ app.get('/user/postsCreated', authenticateToken, async (req, res) => {
     }
 })
 
-app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
-    const username = req.username
+app.get('/user/commentsCreated/:username', checkToken, async (req, res) => {
+    const username = req.params.username
+    const usernameVisiting = req.username
 
     try {
         const user = await User.findOne({ username })
+
+        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
 
         const postsWithUserAction = await Posts.find({ "comments.userId": user._id }).lean()
 
@@ -314,15 +333,14 @@ app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
                     comments.unshift(comment)
                     comments[0].postTitle = postWithUserAction.title
 
-                    user.commentsLiked.every((commentLiked) => {
-                        if (commentLiked.commentId.toString() === comment._id.toString()) {
-                            comments[0].actionType = commentLiked.actionType
-                            return false
+                    if (userVisiting) {
+                        for (const userVisitingLikedComment of userVisiting.commentsLiked) {
+                            if (comment._id.toString() === userVisitingLikedComment.commentId.toString()) {
+                                comments[0].actionType = userVisitingLikedComment.actionType
+                            }
                         }
-
-                        return true
-                    })
-                    comments[0].isAuthor = true
+                    }
+                    if (usernameVisiting === username) comments[0].isAuthor = true
                 }
             })
         })
@@ -335,11 +353,14 @@ app.get('/user/commentsCreated', authenticateToken, async (req, res) => {
     }
 })
 
-app.get('/user/commentsLiked', authenticateToken, async (req, res) => {
-    const username = req.username
+app.get('/user/commentsLiked/:username', checkToken, async (req, res) => {
+    const username = req.params.username
+    const usernameVisiting = req.username
 
     try {
         const user = await User.findOne({ username })
+
+        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
 
         const comments = []
 
@@ -351,9 +372,15 @@ app.get('/user/commentsLiked', authenticateToken, async (req, res) => {
                     if (comment._id.toString() === commentLiked.commentId.toString()) {
                         comments.unshift(comment)
                         comments[0].postTitle = post.title
-                        comments[0].actionType = commentLiked.actionType
+                        if (userVisiting) {
+                            for (const userVisitingLikedComment of userVisiting.commentsLiked) {
+                                if (comment._id.toString() === userVisitingLikedComment.commentId.toString()) {
+                                    comments[0].actionType = userVisitingLikedComment.actionType
+                                }
+                            }
+                        }
                     }
-                    if (comment.userId.toString() === user._id.toString()) {
+                    if (comment.userId.toString() === userVisiting._id.toString()) {
                         comment.isAuthor = true
                     }
                 })
@@ -394,19 +421,20 @@ app.patch('/user/notification/:id', authenticateToken, async (req, res) => {
     }
 })
 
-app.get('/user/:accessToken', (req, res) => {
-    const accessToken = req.params.accessToken
+app.get('/user/:username', checkToken, async (req, res) => {
+    const username = req.username ?? req.params.username
+    
+    try {
+        const user = await User.findOne({ username })
 
-    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
-        if (err)
-            return res.sendStatus(403)
+        if (user === null) return res.sendStatus(404)
 
-        const username = user.username
-
-        const users = await User.find({ username })
-
-        res.status(200).send({ user: users[0] })
-    })
+        return res.status(200).send({ user })
+    }
+    catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
 })
 
 app.get('/user/avatar/:username', async (req, res) => {

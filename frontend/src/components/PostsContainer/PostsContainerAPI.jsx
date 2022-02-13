@@ -3,12 +3,14 @@ import PostsContainer from './PostsContainer'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { useParams } from 'react-router-dom'
 
 function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const postsPerRequest = 5
     const [postNumber, setPostNumber] = useState(0)
     const [postsAvailable, setPostsAvailable] = useState(true)
     const [posts, setPosts] = useState([])
+    const { profileName } = useParams()
 
     function updatePost(updatedPost, index, shouldBeDeleted) {
         const tmpPosts = posts
@@ -58,15 +60,12 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `http://localhost:3001/user/postsLiked`,
+            url: `http://localhost:3001/user/postsLiked/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            }),
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
+            })
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)
@@ -83,15 +82,12 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `http://localhost:3001/user/postsCreated`,
+            url: `http://localhost:3001/user/postsCreated/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            }),
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
+            })
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)

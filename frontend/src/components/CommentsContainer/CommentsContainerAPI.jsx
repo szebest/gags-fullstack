@@ -3,9 +3,11 @@ import React, {useState, useEffect} from 'react'
 import Cookies from 'js-cookie'
 import CommentsContainer from './CommentsContainer'
 import axios from 'axios'
+import { useParams } from 'react-router-dom'
 
 export default function CommentsContainerAPI({ sectionName, postID, requestType, arePostsAvailable, showNewComment }) {
     const [comments, setComments] = useState([])
+    const { profileName } = useParams()
 
     let sendRequest
 
@@ -24,11 +26,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsCreated() {
-        axios.get(`http://localhost:3001/user/commentsCreated`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        axios.get(`http://localhost:3001/user/commentsCreated/${profileName}`)
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -38,11 +36,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsLiked() {
-        axios.get(`http://localhost:3001/user/commentsLiked`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        axios.get(`http://localhost:3001/user/commentsLiked/${profileName}`)
         .then(res => {
             setComments([...res.data.comments])
         })

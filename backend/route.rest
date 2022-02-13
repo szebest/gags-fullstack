@@ -99,3 +99,7 @@ PATCH http://localhost:3001/posts/61cb7b4961162b722603460c/comment/61cc22f589b22
 DELETE http://localhost:3001/posts/61d8b1780c7c996d6affeaed
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFhYWFhYSIsImlhdCI6MTY0MTU5MDY3NywiZXhwIjoxNjQxNTkyNDc3fQ.KB0ecqTvL7TYKqZ5w2af8xNNCDylmb9mFPAiYa0IxXU
+
+###
+
+GET http://localhost:3001/user/aaaaaa

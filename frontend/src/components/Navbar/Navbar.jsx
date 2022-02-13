@@ -30,7 +30,11 @@ function Navbar() {
 
     useEffect(() => {
         if (hasAccess !== undefined && hasAccess) {
-            axios.get(`http://localhost:3001/user/${Cookies.get("accessToken")}`)
+            axios.get(`http://localhost:3001/user/loggedIn}`, {
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get("accessToken")}`
+                }
+            })
             .then((res) => {
                 setUser(res.data.user)
                 socket.emit('username', res.data.user.username)
@@ -87,7 +91,7 @@ function Navbar() {
             {hasAccess &&
                 <>
                     <li onClick={() => setBurgerMenuClicked(false)}>
-                        <Link to="/profile" className={classes.profile}>
+                        <Link to={`/profile/${user.username}`} className={classes.profile}>
                             <img 
                                 alt="profile picture"
                                 src={user.imgSrc}

@@ -107,9 +107,6 @@ function App() {
                 <Route exact path="/upload">
                     <UploadSite />
                 </Route>
-                <Route exact path="/profile">
-                    <ProfileSite />
-                </Route>
                 <Route exact path="/profile/:profileName">
                     <ProfileSite />
                 </Route>

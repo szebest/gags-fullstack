@@ -1,19 +1,18 @@
 import classes from './styles/ProfileSite.module.scss'
 import { useState, useEffect } from 'react'
 import { Redirect } from "react-router-dom"
-import Cookies from 'js-cookie'
 import axios from 'axios'
 import PostsContainerAPI from '../../PostsContainer/PostsContainerAPI'
-import { useSelector } from 'react-redux'
 import CommentsContainerAPI from '../../CommentsContainer/CommentsContainerAPI'
+import { useParams } from 'react-router-dom'
 
 function ProfileSite() {
     const [user, setUser] = useState({})
     const [selected, setSelected] = useState(0)
     const [daysActive, setDaysActive] = useState()
     const [postsAvailable, setPostsAvailable] = useState(true)
-
-    const hasAccess = useSelector(state => state.hasAccess)
+    const [error, setError] = useState(null)
+    const { profileName } = useParams()
 
     const treatAsUTC = (date) => {
         const result = new Date(date)
@@ -27,12 +26,13 @@ function ProfileSite() {
     }
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/user/${Cookies.get("accessToken")}`)
+        axios.get(`http://localhost:3001/user/${profileName}`)
         .then((res) => {
             setUser(res.data.user)
+            setError(false)
         })
         .catch(err => {
-            console.log(err)
+            setError(true)
         })
     }, [selected])
 
@@ -46,10 +46,10 @@ function ProfileSite() {
         setDaysActive(differenceInDays)
     }, [user])
 
-    if (hasAccess !== null && !hasAccess)
+    if (error === true) 
         return <Redirect to="/" />
 
-    if (hasAccess === null) 
+    if (error === null)
         return null
 
     return (
