@@ -234,14 +234,14 @@ function Post({ post, saveInLS, updatePost, index }) {
                     <p>💬</p>
                     <p>{post.commentsAmount}</p>
                 </div>
-                <span className={classes.relativeWrapper}>
-                    {openOptions &&
-                        <div ref={modalRef} className={classes.optionsContainerContent}>
-                            <p onClick={() => setEditing(true)}>Edit Post</p>
-                            <p onClick={deleteThisPost}>Delete Post</p>
-                        </div>
-                    }
-                    {post && post.isAuthor &&
+                {post && post.isAuthor && 
+                    <span className={classes.relativeWrapper}>
+                        {openOptions &&
+                            <div ref={modalRef} className={classes.optionsContainerContent}>
+                                <p onClick={() => setEditing(true)}>Edit Post</p>
+                                <p onClick={deleteThisPost}>Delete Post</p>
+                            </div>
+                        }
                         <div className={classes.statistics}>
                             <div ref={optionsRef} className={classes.options} onClick={() => setOpenOptions(prev => !prev)}>
                                 <div className={classes.optionsContainerStyle}></div>
@@ -249,8 +249,8 @@ function Post({ post, saveInLS, updatePost, index }) {
                                 <div className={classes.optionsContainerStyle}></div>
                             </div>
                         </div>
-                    }
-                </span>
+                    </span>
+                }
             </div>
         </div>
     );
