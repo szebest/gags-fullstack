@@ -20,6 +20,11 @@
     gap: 8px;
     width: 90%;
     align-self: center;
+
+    h3 {
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+    }
 }
 
 .observer {

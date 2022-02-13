@@ -231,7 +231,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                         <p>▼</p>
                         <p>{comment.dislikes}</p>
                     </div>
-                    <div onClick={() => setOpenReply(prev => !prev)} className={`${classes.controlContainer} ${classes.hoverBackground}`}>
+                    <div onClick={() => setOpenReply(/*prev => !prev*/false)} className={`${classes.controlContainer} ${classes.hoverBackground}`}>
                         <p>Reply</p>
                     </div>
                     <div className={classes.relativeWrapper}>
