@@ -19,7 +19,7 @@ function UploadSite() {
 
     useEffect(() => {
         let cancel
-        axios.get('http://localhost:3001/sections', {
+        axios.get('https://gags-backend.herokuapp.com/sections', {
             cancelToken: new axios.CancelToken(c => cancel = c)
         })
         .then(res => {
@@ -61,7 +61,7 @@ function UploadSite() {
 
             axios({
                 method: "POST",
-                url: "http://localhost:3001/upload",
+                url: "https://gags-backend.herokuapp.com/upload",
                 data: form,
                 headers: { 
                     "Content-Type": "multipart/form-data",

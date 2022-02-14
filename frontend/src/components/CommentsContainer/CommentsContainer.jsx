@@ -35,7 +35,7 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
             promiseArray.push(new Promise((resolve, reject) => {
                 axios({
                     method: "GET",
-                    url: `http://localhost:3001/user/avatar/${key}`,
+                    url: `https://gags-backend.herokuapp.com/user/avatar/${key}`,
                 })
                     .then(res => {
                         avatarsCopy.set(key, res.data.imgSrc)

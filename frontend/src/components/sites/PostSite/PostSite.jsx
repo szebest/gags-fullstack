@@ -8,7 +8,7 @@ export default function PostSite() {
 
     useEffect(() => {
         let cancel
-        axios.get(`http://localhost:3001/posts/${postID}`, {
+        axios.get(`https://gags-backend.herokuapp.com/posts/${postID}`, {
             cancelToken: new axios.CancelToken(c => cancel = c)
         })
         .then(res => {

@@ -21,7 +21,7 @@ function App() {
     const dispatch = useDispatch()
 
     const sendRefreshRequest = () => {
-        axios.post('http://localhost:3001/refresh', {
+        axios.post('https://gags-backend.herokuapp.com/refresh', {
             refreshToken: Cookies.get('refreshToken')
         })
         .then(res => {
@@ -72,7 +72,7 @@ function App() {
 
     useEffect(() => {
         if (accessToken !== undefined) {
-            axios.post('http://localhost:3001/hasAccess', {
+            axios.post('https://gags-backend.herokuapp.com/hasAccess', {
                 accessToken: Cookies.get('accessToken')
             })
             .then(res => {
