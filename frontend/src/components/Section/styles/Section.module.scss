@@ -3,6 +3,7 @@
     border: 2px solid #9bd4e7;
     background-color: #eeeeee46;
     width: 100%;
+    align-self: center;
     cursor: pointer;
     border-radius: 5px;
     margin-left: 3px;
@@ -26,6 +27,8 @@
 
 @media (max-width: 1200px) {
     .sectionWrapper {
+        margin-left: 0px;
+        width: calc(100% - 4px);
         margin-left: 0px;
     }
 }
