@@ -41,6 +41,10 @@ app.use(dnsPrefetchControl({ allow: true }))
 
 const PORT = process.env.PORT || 3001
 
+app.get('/', (req, res) => {
+    return res.send("Welcome to GAGS API")
+})
+
 app.post('/hasAccess', (req, res) => {
     const accessToken = req.body.accessToken
 
