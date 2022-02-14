@@ -189,3 +189,11 @@
         width: 45%;
     }
 }
+
+@media (max-width: 525px) {
+    .statistics {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
