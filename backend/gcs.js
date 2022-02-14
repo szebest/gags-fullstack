@@ -1,11 +1,12 @@
 const fs = require('fs')
 const { Duplex } = require('stream')
 const { google } = require('googleapis')
+const path = require('path')
 
 const SCOPES = ['https://www.googleapis.com/auth/drive']
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: `${__dirname}\\glassy-courage-326311-637c273863cd.json`,
+    keyFile: path.join(__dirname, 'glassy-courage-326311-637c273863cd.json'),
     scopes: SCOPES
 })
 
