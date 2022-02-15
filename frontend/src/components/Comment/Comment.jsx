@@ -43,7 +43,12 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                 updateThisComment(res.data.updatedComment, index)
             })
             .catch(err => {
-                console.log(err)
+                if (err.response?.data.badRequest === true) {
+                    setAction({
+                        like: err.response.data.actionDid === 'like' ? 1 : 0,
+                        dislike: err.response.data.actionDid === 'dislike' ? 1 : 0
+                    })
+                }
             })
     }, [action])
 

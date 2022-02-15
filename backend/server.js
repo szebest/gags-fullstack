@@ -747,11 +747,11 @@ app.patch('/posts/:postID/comment/:commentID/like', authenticateToken, async (re
                     foundPost.comments[foundCommentIndex].likes += like
                 }
             }
-            else if (actionDid === 'none' && like === 1 && dislike === 0) {
+            else if (actionDid === 'none' && like === 1) {
                 foundPost.comments[foundCommentIndex].likes += like
                 foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'like'
             }
-            else if (actionDid === 'none' && dislike === 1 && like === 0) {
+            else if (actionDid === 'none' && dislike === 1) {
                 foundPost.comments[foundCommentIndex].dislikes += dislike
                 foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'dislike'
             }
@@ -907,11 +907,11 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundPost.likes += like
                 }
             }
-            else if (actionDid === 'none' && like === 1 && dislike === 0) {
+            else if (actionDid === 'none' && like === 1) {
                 foundPost.likes += like
                 foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'like'
             }
-            else if (actionDid === 'none' && dislike === 1 && like === 0) {
+            else if (actionDid === 'none' && dislike === 1) {
                 foundPost.dislikes += dislike
                 foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'dislike'
             }
