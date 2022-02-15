@@ -26,6 +26,7 @@ function Post({ post, saveInLS, updatePost, index }) {
     useEffect(() => {
         setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
     }, [window.location.pathname])
+
     useEffect(() => {
         if (!post._id) return
 
@@ -45,11 +46,15 @@ function Post({ post, saveInLS, updatePost, index }) {
         })
         .then(res => {
             if (saveInLS) localStorage.setItem('postToBeUpdated', res.data.updatedPost._id)
-
             updatePost(res.data.updatedPost, index)
         })
         .catch(err => {
-            console.log(err)
+            if (err.response?.data.badRequest === true) {
+                setAction({
+                    like: err.response.data.actionDid === 'like' ? 1 : 0,
+                    dislike: err.response.data.actionDid === 'dislike' ? 1 : 0
+                })
+            }
         })
     }, [action])
 
