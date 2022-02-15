@@ -739,8 +739,7 @@ app.patch('/posts/:postID/comment/:commentID/like', authenticateToken, async (re
                     foundPost.comments[foundCommentIndex].dislikes += dislike
                 }
             }
-
-            if (actionDid === 'dislike' && dislike === -1) {
+            else if (actionDid === 'dislike' && dislike === -1) {
                 foundPost.comments[foundCommentIndex].dislikes += dislike
                 if (like === 0) foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'none'
                 else if (like === 1) {
@@ -748,16 +747,18 @@ app.patch('/posts/:postID/comment/:commentID/like', authenticateToken, async (re
                     foundPost.comments[foundCommentIndex].likes += like
                 }
             }
-
-            if (actionDid === 'none' && like === 1 && dislike === 0) {
+            else if (actionDid === 'none' && like === 1 && dislike === 0) {
                 foundPost.comments[foundCommentIndex].likes += like
                 foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'like'
             }
-
-            if (actionDid === 'none' && dislike === 1 && like === 0) {
+            else if (actionDid === 'none' && dislike === 1 && like === 0) {
                 foundPost.comments[foundCommentIndex].dislikes += dislike
                 foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType = 'dislike'
             }
+            else return res.status(400).json({
+                badRequest: true,
+                actionDid: foundUser.commentsLiked[foundAlreadyLikedCommentIndex].actionType
+            })
         }
         else {
             if (dislike < 0 || like < 0) return res.status(400)
@@ -898,8 +899,7 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundPost.dislikes += dislike
                 }
             }
-
-            if (actionDid === 'dislike' && dislike === -1) {
+            else if (actionDid === 'dislike' && dislike === -1) {
                 foundPost.dislikes += dislike
                 if (like === 0) foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'none'
                 else if (like === 1) {
@@ -907,16 +907,18 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
                     foundPost.likes += like
                 }
             }
-
-            if (actionDid === 'none' && like === 1 && dislike === 0) {
+            else if (actionDid === 'none' && like === 1 && dislike === 0) {
                 foundPost.likes += like
                 foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'like'
             }
-
-            if (actionDid === 'none' && dislike === 1 && like === 0) {
+            else if (actionDid === 'none' && dislike === 1 && like === 0) {
                 foundPost.dislikes += dislike
                 foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType = 'dislike'
             }
+            else return res.status(400).json({
+                badRequest: true,
+                actionDid: foundUser.postsLiked[foundAlreadyLikedPostIndex].actionType
+            })
         }
         else {
             foundPost.likes += like
