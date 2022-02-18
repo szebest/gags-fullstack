@@ -19,7 +19,7 @@ function Navbar() {
     useEffect(() => {
         socket.on('notification', (notification) => {
             console.log(notification)
-            user.notifications.unshift({ message: notification.message })
+            user.notifications.unshift(notification)
             setUser(prev => {return {...prev}})
         })
 

@@ -954,15 +954,15 @@ app.patch('/posts/:id', authenticateToken, async (req, res) => {
         await User.findOneAndUpdate({ username }, foundUser)
 
         if (like > 0 && notificationMessage !== '' && postAuthor !== '') {
-            const foundAuthor = (await User.find({ postAuthor }))[0]
+            const foundAuthor = await User.findOne({ postAuthor }).lean()
             foundAuthor.notifications.unshift({})
             foundAuthor.notifications[0].message = notificationMessage
             foundAuthor.notifications[0].refId = postObjectID
             foundAuthor.notifications[0].notificationType = 'post'
 
-            await User.findOneAndUpdate({ postAuthor }, foundAuthor)
+            const updatedNotification = (await User.findOneAndUpdate({ postAuthor }, foundAuthor, { new: true })).notifications[0]
 
-            if (socketObject) socketObject.socket.emit('notification', foundAuthor.notifications[0])
+            if (socketObject) socketObject.socket.emit('notification', updatedNotification)
         }
 
         return res.status(200).json({ updatedPost: updatedPost })
