@@ -40,11 +40,9 @@ export default function PostModal() {
     }, [postID])
 
     useEffect(() => {
-        document.body.classList.add("modal-open")
         document.getElementsByTagName('html')[0].classList.add("modal-open")
 
         return () => {
-            document.body.classList.remove("modal-open")
             document.getElementsByTagName('html')[0].classList.remove("modal-open")
         }
     }, [])
