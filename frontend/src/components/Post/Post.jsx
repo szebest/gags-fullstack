@@ -33,6 +33,11 @@ function Post({ post, saveInLS, updatePost, index }) {
     useEffect(() => {
         if (!post._id) return
 
+        if (localStorage.getItem('doNotSendLike') !== null) {
+            localStorage.removeItem('doNotSendLike')
+            return
+        }
+
         const like = action.like - tmpAction.like
         const dislike = action.dislike - tmpAction.dislike
 
@@ -48,7 +53,14 @@ function Post({ post, saveInLS, updatePost, index }) {
             }
         })
         .then(res => {
-            if (saveInLS) localStorage.setItem('postToBeUpdated', res.data.updatedPost._id)
+            const post = res.data.updatedPost
+            if (saveInLS) localStorage.setItem('postToBeUpdated', JSON.stringify({
+                likes: post.likes,
+                dislikes: post.dislikes,
+                title: post.title,
+                action: action,
+                _id: post._id
+            }))
             updatePost(res.data.updatedPost, index)
         })
         .catch(err => {
@@ -77,28 +89,31 @@ function Post({ post, saveInLS, updatePost, index }) {
         const postIdToBeUpdated = localStorage.getItem('postToBeUpdated')
         const postIdToBeDeleted = localStorage.getItem('postToBeDeleted')
 
-        if (postIdToBeUpdated !== null) {
-            if (postIdToBeUpdated.toString() === post._id.toString()) {
-                axios({
-                    method: "GET",
-                    url: `https://gags-backend.herokuapp.com/posts/${post._id}`,
-                    headers: {
-                        "Authorization": `Bearer ${Cookies.get("accessToken")}`
-                    }
-                })
-                .then(res => {
-                    updatePost(res.data.post, index)
-                    localStorage.removeItem('postToBeUpdated')
-                })
-                .catch(err => {
-                    console.error(err)
-                })
-            }
-        }
-        else if (postIdToBeDeleted !== null) {
+        if (postIdToBeDeleted !== null) {
             if (postIdToBeDeleted.toString() === post._id.toString()) {
                 updatePost(null, index, true)
                 localStorage.removeItem('postToBeDeleted')
+            }
+        }
+        else if (postIdToBeUpdated !== null) {
+            const postData = JSON.parse(postIdToBeUpdated)
+            if (postData._id.toString() === post._id.toString()) {
+                setTimeout(() => {
+                    localStorage.setItem('doNotSendLike', true)
+                    setAction({
+                        like: postData.action.like,
+                        dislike: postData.action.dislike
+                    })
+                }, 10)
+                const tmpPost = {
+                    ...post,
+                    likes: postData.likes,
+                    dislikes: postData.dislikes,
+                    title: postData.title,
+                }
+                updatePost(tmpPost, index)
+
+                localStorage.removeItem('postToBeUpdated')
             }
         }
     }
