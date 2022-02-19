@@ -81,7 +81,7 @@ function UploadSite() {
     const handleImageChange = () => {
         const fileName = imageRef.current.files[0] ? imageRef.current.files[0].name : ""
         const extension = fileName.split('.')[1]
-        if (fileName && (extension === 'jpg' || extension === 'png')) {
+        if (fileName && (extension === 'jpg' || extension === 'png' || extension === 'gif')) {
             const filePath = URL.createObjectURL(imageRef.current.files[0])
 
             if (filePath) {
@@ -128,7 +128,7 @@ function UploadSite() {
                         </select>
                     </div>
                     <div className={classes.fileInputWrapper}>
-                        <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
+                        <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png,.gif" onChange={handleImageChange} />
                         <label htmlFor="file">{fileName.length === 0 ? "Choose an image" : fileName}</label>
                     </div>
                     <div className={classes.error}>{error.file}</div>
