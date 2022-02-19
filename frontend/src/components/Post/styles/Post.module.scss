@@ -120,6 +120,15 @@
     width: 100%;
 }
 
+.underlineHover {
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
 @media (max-width: 800px) {
     .postWrapper {
         margin: 0 10px;

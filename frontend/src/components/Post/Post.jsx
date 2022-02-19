@@ -215,7 +215,9 @@ function Post({ post, saveInLS, updatePost, index }) {
                     </div>
                 </Link>
                 <div className={classes.center}>
-                    <h6>Posted in {post.section} by {post.author}</h6>
+                    <h6>
+                        Posted in <Link className={classes.underlineHover} to={`/section/${post.section}`}>{post.section}</Link> by <a className={classes.underlineHover} target="_blank" href={`/profile/${post.author}`}>{post.author}</a>
+                    </h6>
                 </div>
                 <Link className={classes.fullWidth} to={redirectTo}>
                     <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
