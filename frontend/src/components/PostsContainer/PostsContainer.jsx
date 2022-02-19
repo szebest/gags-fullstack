@@ -3,22 +3,26 @@ import Post from '../Post/Post';
 import { useEffect, useRef } from 'react'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
+import { useParams } from 'react-router-dom'
 
 function PostsContainer({posts, callForMore, sectionName, ready, updatePost}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
     const first = useRef(true)
+    const { postID } = useParams()
 
     useEffect(() => {
-        if (isVisible && (ready !== undefined && ready || ready === undefined)) {
+        if (postID === undefined && isVisible && (ready !== undefined && ready || ready === undefined)) {
             first.current = false
             callForMore()
         }
-    }, [isVisible, sectionName, ready])
+    }, [isVisible, sectionName, ready, postID])
 
     useEffect(() => {
-        setTimeout(() => {if (first.current) callForMore()}, 1000)
-    }, [])
+        if (postID !== undefined) return
+
+        callForMore()
+    }, [postID])
 
     return (
         <div className={classes.limitSpace}>
