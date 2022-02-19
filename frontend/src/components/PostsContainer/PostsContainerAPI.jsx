@@ -13,15 +13,17 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const { profileName } = useParams()
 
     function updatePost(updatedPost, index, shouldBeDeleted) {
-        const tmpPosts = posts
-        if (shouldBeDeleted === true) {
-            tmpPosts.splice(index, 1)
-            setPosts([...tmpPosts])
-        }
-        else {
-            tmpPosts[index] = updatedPost
-            setPosts([...tmpPosts])
-        }
+        setTimeout(() => {
+            const tmpPosts = posts
+            if (shouldBeDeleted === true) {
+                tmpPosts.splice(index, 1)
+                setPosts([...tmpPosts])
+            }
+            else {
+                tmpPosts[index] = updatedPost
+                setPosts([...tmpPosts])
+            }
+        }, 1)
     }
 
     useEffect(() => {

@@ -4,6 +4,7 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { Link, Redirect } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 function Post({ post, saveInLS, updatePost, index }) {
     const [loaded, setLoaded] = useState(false)
@@ -22,6 +23,8 @@ function Post({ post, saveInLS, updatePost, index }) {
     const [redirectTo, setRedirectTo] = useState("")
     const [editing, setEditing] = useState(false)
     const [textEntered, setTextEntered] = useState("")
+    const [shouldRedirect, setShouldRedirect] = useState(false)
+    const { postID, sectionName } = useParams()
 
     useEffect(() => {
         setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
@@ -72,6 +75,7 @@ function Post({ post, saveInLS, updatePost, index }) {
 
     if (saveInLS === undefined) {
         const postIdToBeUpdated = localStorage.getItem('postToBeUpdated')
+        const postIdToBeDeleted = localStorage.getItem('postToBeDeleted')
 
         if (postIdToBeUpdated !== null) {
             if (postIdToBeUpdated.toString() === post._id.toString()) {
@@ -89,6 +93,12 @@ function Post({ post, saveInLS, updatePost, index }) {
                 .catch(err => {
                     console.error(err)
                 })
+            }
+        }
+        else if (postIdToBeDeleted !== null) {
+            if (postIdToBeDeleted.toString() === post._id.toString()) {
+                updatePost(null, index, true)
+                localStorage.removeItem('postToBeDeleted')
             }
         }
     }
@@ -170,11 +180,20 @@ function Post({ post, saveInLS, updatePost, index }) {
             }
         })
             .then(res => {
-                updatePost(null, index, true)
+                if (postID !== undefined) {
+                    if (saveInLS) localStorage.setItem('postToBeDeleted', res.data.deleted._id)
+
+                    setShouldRedirect(true)
+                }
+                else updatePost(null, index, true)
             })
             .catch(err => {
                 console.log(err)
             })
+    }
+
+    if (shouldRedirect) {
+        return <Redirect to={sectionName === undefined ? "/" : `/section/${sectionName}`} />
     }
 
     if (commentClicked) {

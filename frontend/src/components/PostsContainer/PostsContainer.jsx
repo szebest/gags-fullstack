@@ -21,7 +21,7 @@ function PostsContainer({posts, callForMore, sectionName, ready, updatePost}) {
     useEffect(() => {
         if (postID !== undefined) return
 
-        setTimeout(() => {if (first.current) callForMore()}, 100)
+        setTimeout(() => {if (first.current) callForMore()}, 1000)
     }, [postID])
 
     return (
