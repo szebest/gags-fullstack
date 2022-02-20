@@ -15,6 +15,7 @@ import ProfileSite from './components/sites/ProfileSite/ProfileSite'
 import { useDispatch } from 'react-redux'
 import { setHasAccess } from './actions'
 import PostModal from './components/PostModal/PostModal'
+import AboutSite from './components/sites/AboutSite/AboutSite'
 
 function App() {
     const [accessToken, setAccessToken] = useState()
@@ -125,6 +126,9 @@ function App() {
                 <Route exact path="/profile/:username/post/:postID">
                     <ProfileSite />
                     <PostModal />
+                </Route>
+                <Route exact path="/about">
+                    <AboutSite />
                 </Route>
             </Switch>
         </Router>

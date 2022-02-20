@@ -1,0 +1,108 @@
+.aboutSiteWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    margin: 0px 5%;
+    height: calc(100% - 86px);
+
+    h1, h2, h3, h4, h5, h6 {
+        margin: 8px 0;
+    }
+
+    p {
+        margin: 10px 0;
+    }
+
+    img {
+        max-width: 48px;
+        min-width: 48px;
+        max-height: 48px;
+        min-height: 48px;
+    }
+}
+
+.limitWidth {
+    width: 80%;
+    margin: 0px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.aboutSiteAuthor {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.limitSpace {
+    width: 75%;
+}
+
+.aboutSiteTechStack {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: row;
+
+    &>div {
+        max-width: 225px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+}
+
+.beforeLine {
+    &::before {
+        content: '';
+        display: inline-block;
+        height: 2px;
+        width: 100%;
+        background-color: rgba(150, 150, 150, 0.75);
+    }
+}
+
+.aboutSiteLink {
+    margin-bottom: 10px;
+
+    &>ul {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.styledUl {
+    list-style-type: none;
+    padding: 0px;
+    margin: 2px;;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    &>li {
+        &>div {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: row;
+            gap: 10px;
+        }
+    }
+}
