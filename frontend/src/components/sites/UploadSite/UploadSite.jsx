@@ -4,6 +4,9 @@ import Cookies from 'js-cookie'
 import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import SendButton from '../../SendButton/SendButton'
+import InputField from '../../InputField/InputField'
+import FileInput from '../../FileInput/FileInput'
 
 function UploadSite() {
     const imageRef = useRef()
@@ -112,12 +115,10 @@ function UploadSite() {
             </div>
             <div className={classes.formContainer}>
                 <form className={classes.form} onSubmit={HandleSubmit}>
-                    <div className={classes.inputData}>
-                        <div className={classes.inputDataWrapper}>
-                            <input className={title.length > 0 ? classes.hasValue : ""} type="text" value={title} onChange={(e) => setTitle(e.target.value)}/>
-                            <label>Post title</label>
-                        </div>
-                    </div>
+                    <InputField hasValue={title.length > 0}>
+                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}/>
+                        <label>Post title</label>
+                    </InputField>
                     <div className={classes.error}>{error.title}</div>
                     <div className={classes.selectData}>
                         <label>Category</label>
@@ -127,14 +128,14 @@ function UploadSite() {
                             )}
                         </select>
                     </div>
-                    <div className={classes.fileInputWrapper}>
+                    <FileInput>
                         <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png,.gif" onChange={handleImageChange} />
                         <label htmlFor="file">{fileName.length === 0 ? "Choose an image" : fileName}</label>
-                    </div>
+                    </FileInput>
                     <div className={classes.error}>{error.file}</div>
-                    <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Submit" disabled={submitClicked} /></div>
-                    </div>
+                    <SendButton>
+                        <input type="submit" value="Submit" disabled={submitClicked} />
+                    </SendButton>
                 </form>
             </div>
         </div>

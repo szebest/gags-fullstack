@@ -4,8 +4,8 @@ import axios from 'axios'
 import { Redirect, Link } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
-import show from '../../../assets/show.svg'
-import hide from '../../../assets/hide.svg'
+import SendButton from '../../SendButton/SendButton'
+import InputField from '../../InputField/InputField'
 
 function LoginSite() {
     const queryParam = new URLSearchParams(document.location.search).get("username")
@@ -54,35 +54,28 @@ function LoginSite() {
             <div className={classes.mainContent}>
                 <h1>Login to Your Account</h1>
                 <form className={classes.loginSiteForm} onSubmit={handleSubmit}>
-                    <div className={classes.inputData}>
-                        <div className={classes.inputDataWrapper}>
-                            <input className={usernameState.length > 0 ? classes.hasValue : ""} type="text" value={usernameState} onChange={(e) => setUsernameState(e.target.value)}/>
-                            <label>Username</label>
-                        </div>
-                    </div>
-                    <div className={classes.inputData}>
-                        <div className={classes.inputDataWrapper}>
-                            <input className={passwordState.length > 0 ? classes.hasValue : ""} type={showPassword ? "text" : "password"} value={passwordState} onChange={(e) => setPasswordState(e.target.value)}/>
-                            <label>Password</label>
-                            <div className={classes.showPassword} onClick={() => setShowPassword(prev => !prev)}>
-                                <img width="30px" height="30px" src={showPassword ? hide : show} alt="show hide" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Submit" /></div>
-                    </div>
+                    <InputField hasValue={usernameState.length > 0}>
+                        <input className={usernameState.length > 0 ? classes.hasValue : ""} type="text" value={usernameState} onChange={(e) => setUsernameState(e.target.value)}/>
+                        <label>Username</label>
+                    </InputField>
+                    <InputField showPasswordClickCallback={() => setShowPassword(prev => !prev)} showPassword={showPassword} hasValue={passwordState.length > 0}>
+                        <input type={showPassword ? "text" : "password"} value={passwordState} onChange={(e) => setPasswordState(e.target.value)}/>
+                        <label>Password</label>
+                    </InputField>
+                    <SendButton>
+                        <input type="submit" value="Submit" />
+                    </SendButton>
                 </form>
                 <h3 className={classes.error}>{error}</h3>
             </div>
             <div className={classes.registerNavigation}>
                 <h1>New here?</h1>
                 <p>Sign up and discover a great amount of new opportunities!</p>
-                <Link to="/register">
-                    <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Register" /></div>
-                    </div>
-                </Link>
+                <SendButton>
+                    <Link to="/register">
+                        <input type="submit" value="Register" />
+                    </Link>
+                </SendButton>
             </div>
         </div>
     );

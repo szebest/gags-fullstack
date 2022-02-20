@@ -1,0 +1,42 @@
+.fileInputWrapper {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    min-height: 80px;
+    margin: 10px 0px;
+
+	input {
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+
+        & + label {
+            align-self: center;
+            font-weight: 700;
+            color: white;
+            background-color: black;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            height: 48px;
+            width: 200px;
+        }
+
+        &:focus + label, & + label:hover {
+            background-color: red;
+        }
+
+        &:focus + label {
+            outline: 1px dotted #000;
+            outline: -webkit-focus-ring-color auto 5px;
+        }
+
+        & + label * {
+            pointer-events: none;
+        }
+    }
+}

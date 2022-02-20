@@ -164,7 +164,15 @@ function Post({ post, saveInLS, updatePost, index }) {
             }
         })
             .then(res => {
-                updatePost(res.data.updatedPost, index)
+                const post = res.data.updatedPost
+                if (saveInLS) localStorage.setItem('postToBeUpdated', JSON.stringify({
+                    likes: post.likes,
+                    dislikes: post.dislikes,
+                    title: post.title,
+                    action: action,
+                    _id: post._id
+                }))
+                updatePost(post, index)
                 setEditing(false)
             })
             .catch(err => {

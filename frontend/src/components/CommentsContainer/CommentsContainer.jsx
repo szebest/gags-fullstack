@@ -5,6 +5,7 @@ import NewComment from '../NewComment/NewComment'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
 import axios from 'axios'
+import SendButton from '../SendButton/SendButton'
 
 export default function CommentsContainer({comments, callForMore, sectionName, ready, updateComment, sendComment, refreshComments, postID, showNewComment}) {
     const observeRef = useRef()
@@ -58,7 +59,9 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
         <>
             {showNewComment &&
             <NewComment sendComment={sendComment} parentComment={null}>
-                <button onClick={refreshComments}>Refresh comment section</button>
+                <SendButton>
+                    <input type="submit" value="Refresh comment section" onClick={refreshComments} />
+                </SendButton>
             </NewComment>
             }
             <div className={classes.container}>

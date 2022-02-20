@@ -3,8 +3,9 @@ import { useRef, useState } from 'react';
 import axios from 'axios';
 import { Link, Redirect } from 'react-router-dom';
 import { useSelector } from 'react-redux'
-import show from '../../../assets/show.svg'
-import hide from '../../../assets/hide.svg'
+import SendButton from '../../SendButton/SendButton'
+import InputField from '../../InputField/InputField'
+import FileInput from '../../FileInput/FileInput'
 
 function RegisterSite() {
     const [username, setUsername] = useState("")
@@ -111,34 +112,22 @@ function RegisterSite() {
             <div className={classes.mainContent}>
                 <h1>Create an account</h1>
                 <form onSubmit={handleSubmit} className={classes.registerSiteForm}>
-                    <div className={classes.inputData}>
-                        <div className={`${classes.inputDataWrapper} ${error.username.length > 0 ? classes.errorInput : ""}`}>
-                            <input className={username.length > 0 ? classes.hasValue : ""} onChange={(e) => setUsername(e.target.value)} type="text" />
-                            <label>Username</label>
-                        </div>
-                    </div>
+                    <InputField error={error.username.length > 0} hasValue={username.length > 0}>
+                        <input onChange={(e) => setUsername(e.target.value)} type="text" />
+                        <label>Username</label>
+                    </InputField>
                     <div className={classes.error}>{error.username}</div>
-                    <div className={classes.inputData}>
-                        <div className={`${classes.inputDataWrapper} ${error.password.length > 0 ? classes.errorInput : ""}`}>
-                            <input className={password.length > 0 ? classes.hasValue : ""} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} />
-                            <label>Password</label>
-                            <div className={classes.showPassword} onClick={() => setShowPassword(prev => !prev)}>
-                                <img width="30px" height="30px" src={showPassword ? hide : show} alt="show hide" />
-                            </div>
-                        </div>
-                    </div>
+                    <InputField showPasswordClickCallback={() => setShowPassword(prev => !prev)} showPassword={showPassword} error={error.password.length > 0} hasValue={password.length > 0}>
+                        <input onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} />
+                        <label>Password</label>
+                    </InputField>
                     <div className={classes.error}>{error.password}</div>
-                    <div className={classes.inputData}>
-                        <div className={`${classes.inputDataWrapper} ${error.confirm.length > 0 ? classes.errorInput : ""}`}>
-                            <input className={confirmPassword.length > 0 ? classes.hasValue : ""} onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} />
-                            <label>Confirm password</label>
-                            <div className={classes.showPassword} onClick={() => setShowConfirmPassword(prev => !prev)}>
-                                <img width="30px" height="30px" src={showConfirmPassword ? hide : show} alt="show hide" />
-                            </div>
-                        </div>
-                    </div>
+                    <InputField showPasswordClickCallback={() => setShowConfirmPassword(prev => !prev)} showPassword={showConfirmPassword} error={error.confirm.length > 0} hasValue={confirmPassword.length > 0}>
+                        <input onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} />
+                        <label>Confirm password</label>
+                    </InputField>
                     <div className={classes.error}>{error.confirm}</div>
-                    <div className={classes.fileInputWrapper}>
+                    <FileInput>
                         {fileSrc.length > 0 &&
                             <img height="80"
                                 width="80"
@@ -149,21 +138,21 @@ function RegisterSite() {
                                 className={classes.profile} />}
                         <input ref={imageRef} type="file" name="file" id="file" accept=".jpg,.png" onChange={handleImageChange} />
                         <label htmlFor="file">{fileName.length === 0 ? "Choose a profile picture" : fileName}</label>
-                    </div>
+                    </FileInput>
                     <div className={classes.error}>{error.file}</div>
-                    <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Submit" disabled={submitted} /></div>
-                    </div>
+                    <SendButton>
+                        <input type="submit" value="Submit" disabled={submitted} />
+                    </SendButton>
                 </form>
             </div>
             <div className={classes.loginNavigation}>
                 <h1>Already have an account?</h1>
                 <p>Click here to log in!</p>
-                <Link to="/login">
-                    <div className={classes.submit}>
-                        <div className={classes.submitWrapper}><input type="submit" value="Login" /></div>
-                    </div>
-                </Link>
+                <SendButton>
+                    <Link to="/login">
+                        <input type="submit" value="Login" />
+                    </Link>
+                </SendButton>
             </div>
         </div>
     );

@@ -1,5 +1,6 @@
 import classes from './styles/NewComment.module.scss'
 import React, {useState} from 'react'
+import SendButton from '../SendButton/SendButton'
 
 export default function NewComment({sendComment, parentComment, children}) {
     const [textEntered, setTextEntered] = useState("")
@@ -20,7 +21,9 @@ export default function NewComment({sendComment, parentComment, children}) {
     return (
         <div className={classes.newComment}>
             <textarea value={textEntered} onChange={(e) => setTextEntered(e.target.value)} />
-            <button onClick={prepareComment}>Comment</button>
+            <SendButton>
+                <input type="submit" value="Comment" onClick={prepareComment} />
+            </SendButton>
             {children}
         </div>
     )

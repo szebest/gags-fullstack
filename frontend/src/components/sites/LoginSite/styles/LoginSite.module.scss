@@ -28,57 +28,6 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
-
-    input {
-        margin: 10px 0px;
-    }
-}
-
-.inputData {
-    height: 50px;
-
-    margin: 15px 0px 15px 0px;
-
-    .inputDataWrapper {
-        position: relative;
-        height: 100%;
-        width: 90%;
-        margin-left: 5%;
-        align-self: center;
-    }
-
-    .showPassword {
-        position: absolute;
-        cursor: pointer;
-        right: 5%;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
-    input {
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        height: 100%;
-        width: 100%;
-        border: none;
-        outline: none;
-        border-bottom: 2px solid silver;
-        font-size: 17px;
-        margin: 0px auto;
-
-        &:valid.hasValue ~ label, &:focus ~ label {
-            transform: translateY(-36px);
-        }
-    }
-
-    label {
-        position: absolute;
-        bottom: 17px;
-        left: 1%;
-        color: grey;
-        pointer-events: none;
-
-        transition: all 0.3s ease;
-    }
 }
 
 .registerNavigation {
@@ -91,75 +40,6 @@
     h1 {
         align-self: center;
         max-width: max-content;
-    }
-}
-
-.submit {
-    margin: 10px 0px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-
-    .submitWrapper {
-        position: relative;
-        width: 50%;
-        max-width: 400px;
-        height: 100%;
-
-        &:before {
-            z-index: -1;
-            position: absolute;
-            content: '';
-            display: inline-block;
-            color: black;
-            background-color: red;
-            top: -5px;
-            left: -10px;
-            width: 33%;
-            height: 33%;
-
-            transition: all 0.3s ease;
-        }
-
-        &:after {
-            z-index: -1;
-            position: absolute;
-            content: '';
-            display: inline-block;
-            color: black;
-            background-color: red;
-            bottom: -5px;
-            right: -10px;
-            width: 33%;
-            height: 33%;
-
-            transition: all 0.3s ease;
-        }
-
-        &:hover {
-            &:before {
-                left: calc(100% + 10px);
-                transform: translateX(-100%);
-            }
-
-            &:after {
-                right: calc(100% + 10px);
-                transform: translateX(100%);
-            }
-        }
-    }
-
-    input {
-        cursor: pointer;
-        margin: 0px;
-        width: 100%;
-        height: 100%;
-        border: 2px solid black;
-        background-color: white;
-
-        font-size: 25px;
-        font-weight: bold;
     }
 }
 
