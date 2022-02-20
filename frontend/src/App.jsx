@@ -18,9 +18,12 @@ import PostModal from './components/PostModal/PostModal'
 
 function App() {
     const [accessToken, setAccessToken] = useState()
+    const [id, setId] = useState(undefined)
     const dispatch = useDispatch()
 
     const sendRefreshRequest = () => {
+        if (accessToken === undefined || accessToken === 'undefined') return
+
         axios.post('https://gags-backend.herokuapp.com/refresh', {
             refreshToken: Cookies.get('refreshToken')
         })
@@ -48,8 +51,7 @@ function App() {
     }, [])
 
     useEffect(() => {
-        let id
-        if (accessToken !== 'undefined') {
+        if (accessToken !== 'undefined' && id === undefined) {
             sendRefreshRequest()
             const str = Cookies.get('expiresIn')
             if (str !== undefined) {
@@ -59,14 +61,17 @@ function App() {
                                 unit === 'm' ?  1000 * 60 :
                                 unit === 'd' ? 1000 * 60 * 24 : 1000
                 const displacementScale = 0.75
-                id = setTimeout(() => {
+                let tmpid = setTimeout(() => {
                     sendRefreshRequest()
                 }, number * multiplier * displacementScale)
+
+                setId(tmpid)
             }
         }
 
         return () => {
             clearTimeout(id)
+            setId(undefined)
         }
     }, [accessToken])
 
