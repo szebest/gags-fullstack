@@ -31,7 +31,7 @@ export default function PostModal() {
             setPost(res.data.post)
         })
         .catch(err => {
-            console.error(err)
+            
         })
     }
 

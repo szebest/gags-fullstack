@@ -53,7 +53,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
             setPostNumber(prev => prev + postsPerRequest)
         })
         .catch(err => {
-            console.error(err)
+            
         })
     }
 
@@ -75,7 +75,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
             setPostNumber(prev => prev + postsPerRequest)
         })
         .catch(err => {
-            console.error(err)
+            
         })
     }
 
@@ -97,7 +97,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
             setPostNumber(prev => prev + postsPerRequest)
         })
         .catch(err => {
-            console.error(err)
+            
         })
     }
     

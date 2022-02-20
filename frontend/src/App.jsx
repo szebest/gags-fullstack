@@ -85,7 +85,6 @@ function App() {
             })
             .catch(err => {
                 //Error, force logout
-                console.log("ERROR LOGOUT")
                 Cookies.set('accessToken', undefined)
                 Cookies.set('refreshToken', undefined)
                 Cookies.set('expiresIn', undefined)

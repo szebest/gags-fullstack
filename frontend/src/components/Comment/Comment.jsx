@@ -123,7 +123,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                 setEditing(false)
             })
             .catch(err => {
-                console.error(err)
+                
             })
     }
 
@@ -139,7 +139,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
                 updateThisComment(null, index, true)
             })
             .catch(err => {
-                console.log(err)
+                
             })
     }
 

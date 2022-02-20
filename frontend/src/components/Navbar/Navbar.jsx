@@ -18,7 +18,6 @@ function Navbar() {
 
     useEffect(() => {
         socket.on('notification', (notification) => {
-            console.log(notification)
             user.notifications.unshift(notification)
             setUser(prev => {return {...prev}})
         })
@@ -40,7 +39,7 @@ function Navbar() {
                 socket.emit('username', res.data.user.username)
             })
             .catch(err => {
-                console.log(err)
+                
             })
         }
         else if (hasAccess !== undefined) socket.emit('close')
@@ -51,7 +50,6 @@ function Navbar() {
             let res = await axios.post('https://gags-backend.herokuapp.com/logout', {
                 refreshToken: Cookies.get("refreshToken")
             })
-            console.log(res)
             if (res.status === 200) {
                 Cookies.set("accessToken", undefined)
                 Cookies.set("refreshToken", undefined)
@@ -60,7 +58,7 @@ function Navbar() {
                 throw Error("Server error, try again")
         }
         catch(err) {
-            console.log(err)
+            
         }
     }
 

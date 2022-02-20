@@ -177,7 +177,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                 setEditing(false)
             })
             .catch(err => {
-                console.error(err)
+                
             })
     }
 
@@ -212,7 +212,7 @@ function Post({ post, saveInLS, updatePost, index }) {
                 else updatePost(null, index, true)
             })
             .catch(err => {
-                console.log(err)
+                
             })
     }
 

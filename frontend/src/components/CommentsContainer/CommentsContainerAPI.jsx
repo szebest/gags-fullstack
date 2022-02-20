@@ -21,7 +21,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
             setComments([...res.data.comments])
         })
         .catch(err => {
-            console.log(err)
+            
         })
     }
 
@@ -31,7 +31,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
             setComments([...res.data.comments])
         })
         .catch(err => {
-            console.log(err)
+
         })
     }
 
@@ -41,7 +41,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
             setComments([...res.data.comments])
         })
         .catch(err => {
-            console.log(err)
+
         })
     }
 
@@ -78,7 +78,6 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
             setComments([...tmpComments])
         })
         .catch(err => {
-            console.log(err)
         })
     }
 

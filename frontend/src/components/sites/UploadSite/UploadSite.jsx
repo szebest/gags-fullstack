@@ -72,7 +72,6 @@ function UploadSite() {
                 }
             })
             .then(res => {
-                console.log(res.data)
                 setRedirect(true)
             })
             .catch(err => {
