@@ -21,10 +21,12 @@ export default function NewComment({sendComment, parentComment, children}) {
     return (
         <div className={classes.newComment}>
             <textarea value={textEntered} onChange={(e) => setTextEntered(e.target.value)} />
-            <SendButton>
-                <input type="submit" value="Comment" onClick={prepareComment} />
-            </SendButton>
-            {children}
+            <div className={classes.marginTop}>
+                <SendButton>
+                    <input type="submit" value="Comment" onClick={prepareComment} />
+                </SendButton>
+                {children}
+            </div>
         </div>
     )
 }

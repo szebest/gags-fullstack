@@ -12,9 +12,10 @@
         min-height: 75px;
         max-height: 300px;
     }
+}
 
-    > button {
-        align-self: center;
-        width: 90%;
+.marginTop {
+    &>* {
+        margin-top: 25px;
     }
 }
