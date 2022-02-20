@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { Link, Redirect } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
+import SendButton from '../SendButton/SendButton'
 
 function Post({ post, saveInLS, updatePost, index }) {
     const [loaded, setLoaded] = useState(false)
@@ -238,11 +239,15 @@ function Post({ post, saveInLS, updatePost, index }) {
                     </div>
                 </div>
                 <div className={classes.actionButtons}>
-                    <button onClick={() => {
-                        setEditing(false)
-                        sendUpdateRequest()
-                    }}>Edit</button>
-                    <button onClick={() => setEditing(false)}>Abort</button>
+                    <SendButton>
+                        <input type="submit" value="Edit" onClick={() => {
+                            setEditing(false)
+                            sendUpdateRequest()
+                        }} />
+                    </SendButton>
+                    <SendButton>
+                        <input type="submit" value="Abort" onClick={() => setEditing(false)} />
+                    </SendButton>
                 </div>
             </div>
         )
