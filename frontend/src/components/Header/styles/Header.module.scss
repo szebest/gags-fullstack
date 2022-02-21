@@ -57,17 +57,17 @@
                     a {
                         text-decoration: none;
                         color: inherit;
-
-                        img {
-                            transform: translateY(2px);
-                            width: 60px;
-                            height: 60px;
-                        }
                     }
                 }
             }
         }
     }
+}
+
+.logo {
+    transform: translateY(2px);
+    width: 60px;
+    height: 60px;
 }
 
 @media (max-width: 1000px) {

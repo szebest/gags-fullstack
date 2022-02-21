@@ -12,7 +12,7 @@ function Header() {
                     <ul>
                         <li>
                             <Link to="/">
-                                <img src={logo} alt="GAGS" />
+                                <img className={classes.logo} src={logo} alt="GAGS" />
                             </Link>
                         </li>
                         <li className={classes.about}>
