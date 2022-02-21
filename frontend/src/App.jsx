@@ -91,6 +91,9 @@ function App() {
                 Cookies.set('expiresIn', undefined)
             })
         }
+        else {
+            dispatch(setHasAccess(false))
+        }
     }, [accessToken])
 
     return (
