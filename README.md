@@ -1,5 +1,8 @@
 # gags-fullstack
 
+# The frontend is hosted [here](https://gags-frontend.herokuapp.com/)
+# The backend is hosted [here](https://gags-backend.herokuapp.com/)
+
 ## This is my hobby fullstack project.
 ## This site is about browsing posted by other users images (May add videos later).
 ## A user can log-in or register. The session is validaten using JSONWebToken
