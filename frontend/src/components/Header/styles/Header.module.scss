@@ -30,7 +30,7 @@
         min-width: 90%;
         
         >div {
-            margin: 5px 15px;
+            margin: 15px 15px 5px;
             display: flex;
             align-items: center;
 
@@ -47,7 +47,6 @@
                 align-items: center;
                 padding: 0px;
                 margin: 0px;
-                margin-top: 10px;
 
                 li {
                     display: flex;
@@ -60,6 +59,7 @@
                         color: inherit;
 
                         img {
+                            transform: translateY(2px);
                             width: 60px;
                             height: 60px;
                         }
