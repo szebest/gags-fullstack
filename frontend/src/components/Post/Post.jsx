@@ -25,7 +25,7 @@ function Post({ post, saveInLS, updatePost, index }) {
     const [editing, setEditing] = useState(false)
     const [textEntered, setTextEntered] = useState("")
     const [shouldRedirect, setShouldRedirect] = useState(false)
-    const { postID, sectionName } = useParams()
+    const { postID, sectionName, profileName } = useParams()
 
     useEffect(() => {
         setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
@@ -217,7 +217,12 @@ function Post({ post, saveInLS, updatePost, index }) {
     }
 
     if (shouldRedirect) {
-        return <Redirect to={sectionName === undefined ? "/" : `/section/${sectionName}`} />
+        if (profileName !== undefined) {
+            return <Redirect to={`/profile/${profileName}`}/>
+        }
+        else {
+            return <Redirect to={sectionName === undefined ? "/" : `/section/${sectionName}`} />
+        }
     }
 
     if (commentClicked) {
