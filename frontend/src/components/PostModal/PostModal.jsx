@@ -60,7 +60,7 @@ export default function PostModal() {
             {post && <div className={`${classes.modalWrapper} ${classes.fadeIn}`}>
                 <Link to={locateBack}>
                     <div className={classes.absoluteButton}>
-                        <p>X</p>
+                        <p>✕</p>
                     </div>
                 </Link>
                 <Scrollbars
