@@ -51,7 +51,7 @@ function Post({ post, saveInLS, updatePost, index }) {
 
         if (like === 0 && dislike === 0) return
 
-        axios.patch(`http://localhost:3001/posts/${post._id}`, {
+        axios.patch(`https://gags-backend.herokuapp.com/posts/${post._id}`, {
             like, dislike
         }, {
             headers: {
@@ -162,7 +162,7 @@ function Post({ post, saveInLS, updatePost, index }) {
             return
         }
 
-        axios.patch(`http://localhost:3001/posts/${post._id}/edit`, {
+        axios.patch(`https://gags-backend.herokuapp.com/posts/${post._id}/edit`, {
             title: textEntered
         }, {
             headers: {
@@ -203,7 +203,7 @@ function Post({ post, saveInLS, updatePost, index }) {
     function deleteThisPost() {
         setOpenOptions(false)
 
-        axios.delete(`http://localhost:3001/posts/${post._id}`, {
+        axios.delete(`https://gags-backend.herokuapp.com/posts/${post._id}`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }

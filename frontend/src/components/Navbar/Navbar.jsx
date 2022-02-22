@@ -11,7 +11,7 @@ function Navbar() {
     const [user, setUser] = useState({})
     const [showNotifications, setShowNotifications] = useState(false)
     const hasAccess = useSelector(state => state.hasAccess)
-    const socket = useMemo(() => io('http://localhost:3001'), [])
+    const socket = useMemo(() => io('https://gags-backend.herokuapp.com'), [])
     const [burgerMenuClicked, setBurgerMenuClicked] = useState(false)
     const burgerMenuRef = useRef()
     const notificationsRef = useRef()
@@ -29,7 +29,7 @@ function Navbar() {
 
     useEffect(() => {
         if (hasAccess !== undefined && hasAccess) {
-            axios.get(`http://localhost:3001/user/loggedIn}`, {
+            axios.get(`https://gags-backend.herokuapp.com/user/loggedIn}`, {
                 headers: {
                     "Authorization": `Bearer ${Cookies.get("accessToken")}`
                 }
@@ -47,7 +47,7 @@ function Navbar() {
 
     const logout = async () => {
         try {
-            let res = await axios.post('http://localhost:3001/logout', {
+            let res = await axios.post('https://gags-backend.herokuapp.com/logout', {
                 refreshToken: Cookies.get("refreshToken")
             })
             if (res.status === 200) {

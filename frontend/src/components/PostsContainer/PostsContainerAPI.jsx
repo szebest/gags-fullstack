@@ -37,7 +37,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: "http://localhost:3001/posts",
+            url: "https://gags-backend.herokuapp.com/posts",
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
@@ -62,7 +62,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `http://localhost:3001/user/postsLiked/${profileName}`,
+            url: `https://gags-backend.herokuapp.com/user/postsLiked/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
@@ -87,7 +87,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `http://localhost:3001/user/postsCreated/${profileName}`,
+            url: `https://gags-backend.herokuapp.com/user/postsCreated/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,

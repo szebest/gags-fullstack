@@ -26,7 +26,7 @@ function Sections() {
     useEffect(() => {
         scrollValueRef.current = window.scrollY
         let cancel
-        axios.get('http://localhost:3001/sections', {
+        axios.get('https://gags-backend.herokuapp.com/sections', {
             cancelToken: new axios.CancelToken(c => cancel = c)
         })
         .then(res => {
