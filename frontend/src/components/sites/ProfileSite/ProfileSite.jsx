@@ -7,7 +7,7 @@ import CommentsContainerAPI from '../../CommentsContainer/CommentsContainerAPI'
 import { useParams } from 'react-router-dom'
 
 function ProfileSite() {
-    const [user, setUser] = useState({})
+    const [user, setUser] = useState(undefined)
     const [selected, setSelected] = useState(0)
     const [daysActive, setDaysActive] = useState()
     const [postsAvailable, setPostsAvailable] = useState(true)
@@ -26,6 +26,7 @@ function ProfileSite() {
     }
 
     useEffect(() => {
+        setUser(undefined)
         axios.get(`http://localhost:3001/user/${profileName}`)
         .then((res) => {
             setUser(res.data.user)
@@ -34,9 +35,11 @@ function ProfileSite() {
         .catch(err => {
             setError(true)
         })
-    }, [selected])
+    }, [profileName])
 
     useEffect(() => {
+        if (user === undefined) return
+        
         const dateNow = new Date()
         const dateJoined = user.joined
 
@@ -56,18 +59,20 @@ function ProfileSite() {
         <div className={classes.siteCenter}>
             <div className={classes.siteCenter}>
                 <div className={classes.profileSiteWrapper}>
-                    <div className={classes.profileInfo}>
-                        <div className={classes.userInfo}>
-                            <img alt="profile" src={user.imgSrc} />
-                            <div>
-                                <h2>{user.username}</h2>
-                                <p>Active for {daysActive} days</p>
+                    {user !== undefined && 
+                        <div className={classes.profileInfo}>
+                            <div className={classes.userInfo}>
+                                <img alt="profile" src={user.imgSrc} />
+                                <div>
+                                    <h2>{user.username}</h2>
+                                    <p>Active for {daysActive} days</p>
+                                </div>
+                            </div>
+                            <div className={classes.about}>
+                                {user.about}
                             </div>
                         </div>
-                        <div className={classes.about}>
-                            {user.about}
-                        </div>
-                    </div>
+                    }
                 </div>
                 <div className={classes.options}>
                     <ul>
@@ -94,16 +99,16 @@ function ProfileSite() {
                             <p>Wow, such empty</p>
                         </div>
                     }
-                    {selected === 0 &&
+                    {user !== undefined && selected === 0 &&
                         <PostsContainerAPI requestType={"created"} arePostsAvailable={arePostsAvailable} />
                     }
-                    {selected === 1 &&
+                    {user !== undefined && selected === 1 &&
                         <PostsContainerAPI requestType={"liked"} arePostsAvailable={arePostsAvailable} />
                     }
-                    {selected === 2 &&
+                    {user !== undefined && selected === 2 &&
                         <CommentsContainerAPI requestType={"created"} arePostsAvailable={arePostsAvailable} />
                     }
-                    {selected === 3 &&
+                    {user !== undefined && selected === 3 &&
                         <CommentsContainerAPI requestType={"liked"} arePostsAvailable={arePostsAvailable} />
                     }
                 </div>
