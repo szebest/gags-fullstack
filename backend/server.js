@@ -228,7 +228,7 @@ app.get('/user/postsLiked/:username', checkToken, async (req, res) => {
     try {
         const user = (await User.findOne({ username }).lean())
 
-        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
+        const userVisiting = usernameVisiting ? (await User.findOne({ username: usernameVisiting }).lean()) : undefined
 
         const userLikedPosts = user.postsLiked
 
@@ -240,7 +240,7 @@ app.get('/user/postsLiked/:username', checkToken, async (req, res) => {
             if (slicedPost.actionType !== "none") {
                 const post = await Posts.findById(slicedPost.postId).lean()
 
-                if (usernameVisiting === username && user._id.toString() === post.userId.toString()) post.isAuthor = true
+                if (userVisiting && userVisiting._id.toString() === post.userId.toString()) post.isAuthor = true
 
                 if (userVisiting) {
                     for (const userVisitingLikedPost of userVisiting.postsLiked) {
@@ -279,7 +279,7 @@ app.get('/user/postsCreated/:username', checkToken, async (req, res) => {
     try {
         const user = (await User.findOne({ username }).lean())
 
-        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
+        const userVisiting = usernameVisiting ? (await User.findOne({ username: usernameVisiting }).lean()) : undefined
 
         const userCreatedPosts = user.postsCreated
 
@@ -290,7 +290,7 @@ app.get('/user/postsCreated/:username', checkToken, async (req, res) => {
         for (const slicedPost of slicedPosts) {
             const post = await Posts.findById(slicedPost.postId).lean()
 
-            if (userVisiting._id.toString() === post.userId.toString()) post.isAuthor = true
+            if (userVisiting && userVisiting._id.toString() === post.userId.toString()) post.isAuthor = true
 
             if (userVisiting) {
                 for (const userVisitingLikedPost of userVisiting.postsLiked) {
@@ -325,7 +325,7 @@ app.get('/user/commentsCreated/:username', checkToken, async (req, res) => {
     try {
         const user = await User.findOne({ username })
 
-        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
+        const userVisiting = usernameVisiting ? (await User.findOne({ username: usernameVisiting }).lean()) : undefined
 
         const postsWithUserAction = await Posts.find({ "comments.userId": user._id }).lean()
 
@@ -344,7 +344,7 @@ app.get('/user/commentsCreated/:username', checkToken, async (req, res) => {
                             }
                         }
                     }
-                    if (usernameVisiting === username) comments[0].isAuthor = true
+                    if (userVisiting && userVisiting._id.toString() === user._id.toString()) comments[0].isAuthor = true
                 }
             })
         })
@@ -364,7 +364,7 @@ app.get('/user/commentsLiked/:username', checkToken, async (req, res) => {
     try {
         const user = await User.findOne({ username })
 
-        const userVisiting = (await User.findOne({ usernameVisiting }).lean())
+        const userVisiting = usernameVisiting ? (await User.findOne({ username: usernameVisiting }).lean()) : undefined
 
         const comments = []
 
@@ -384,7 +384,7 @@ app.get('/user/commentsLiked/:username', checkToken, async (req, res) => {
                             }
                         }
                     }
-                    if (comment.userId.toString() === userVisiting._id.toString()) {
+                    if (userVisiting && comment.userId.toString() === userVisiting._id.toString()) {
                         comment.isAuthor = true
                     }
                 })
@@ -992,8 +992,7 @@ function checkToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const authToken = authHeader && authHeader.split(' ')[1]
 
-    if (authToken === null)
-        next()
+    if (authToken === null || authToken === undefined) next()
     else {
         jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
             if (err) next()

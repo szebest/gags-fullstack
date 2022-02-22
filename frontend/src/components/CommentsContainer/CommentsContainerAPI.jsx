@@ -12,7 +12,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     let sendRequest
 
     function postComments() {
-        axios.get(`https://gags-backend.herokuapp.com/posts/${postID}/comment`, {
+        axios.get(`http://localhost:3001/posts/${postID}/comment`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }
@@ -26,7 +26,11 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsCreated() {
-        axios.get(`https://gags-backend.herokuapp.com/user/commentsCreated/${profileName}`)
+        axios.get(`http://localhost:3001/user/commentsCreated/${profileName}`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -36,7 +40,11 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsLiked() {
-        axios.get(`https://gags-backend.herokuapp.com/user/commentsLiked/${profileName}`)
+        axios.get(`http://localhost:3001/user/commentsLiked/${profileName}`, {
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
+        })
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -65,7 +73,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function sendComment(comment, parentComment) {
-        axios.post(`https://gags-backend.herokuapp.com/posts/${postID}/comment`, {
+        axios.post(`http://localhost:3001/posts/${postID}/comment`, {
             comment
         }, 
         {

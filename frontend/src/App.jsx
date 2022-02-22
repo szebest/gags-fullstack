@@ -25,7 +25,7 @@ function App() {
     const sendRefreshRequest = () => {
         if (accessToken === undefined || accessToken === 'undefined') return
 
-        axios.post('https://gags-backend.herokuapp.com/refresh', {
+        axios.post('http://localhost:3001/refresh', {
             refreshToken: Cookies.get('refreshToken')
         })
         .then(res => {
@@ -78,7 +78,7 @@ function App() {
 
     useEffect(() => {
         if (accessToken !== undefined) {
-            axios.post('https://gags-backend.herokuapp.com/hasAccess', {
+            axios.post('http://localhost:3001/hasAccess', {
                 accessToken: Cookies.get('accessToken')
             })
             .then(res => {

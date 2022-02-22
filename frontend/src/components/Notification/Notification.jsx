@@ -6,7 +6,7 @@ function Notification({ data, setRead, index }) {
     const sendRequest = () => {
         axios({
             method: "PATCH",
-            url: `https://gags-backend.herokuapp.com/user/notification/${data._id}?read=true`,
+            url: `http://localhost:3001/user/notification/${data._id}?read=true`,
             headers: { 
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }

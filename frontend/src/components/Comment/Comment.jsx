@@ -32,7 +32,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
 
         if (like === 0 && dislike === 0) return
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}/like`, {
+        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}/like`, {
             like, dislike
         }, {
             headers: {
@@ -110,7 +110,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
             return
         }
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}/edit`, {
+        axios.patch(`http://localhost:3001/posts/${postID}/comment/${comment._id}/edit`, {
             comment: textEntered
         }, {
             headers: {
@@ -130,7 +130,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
     function deleteThisComment() {
         setOpenOptions(false)
 
-        axios.delete(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}`, {
+        axios.delete(`http://localhost:3001/posts/${postID}/comment/${comment._id}`, {
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }

@@ -37,7 +37,7 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: "https://gags-backend.herokuapp.com/posts",
+            url: "http://localhost:3001/posts",
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
@@ -62,12 +62,15 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `https://gags-backend.herokuapp.com/user/postsLiked/${profileName}`,
+            url: `http://localhost:3001/user/postsLiked/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            })
+            }),
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)
@@ -84,12 +87,15 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
 
         axios({
             method: "GET",
-            url: `https://gags-backend.herokuapp.com/user/postsCreated/${profileName}`,
+            url: `http://localhost:3001/user/postsCreated/${profileName}`,
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            })
+            }),
+            headers: {
+                "Authorization": `Bearer ${Cookies.get("accessToken")}`
+            }
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)

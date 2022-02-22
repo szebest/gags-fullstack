@@ -25,7 +25,7 @@ function LoginSite() {
         setError("")
         setLoading(true)
 
-        axios.post('https://gags-backend.herokuapp.com/login', {
+        axios.post('http://localhost:3001/login', {
             username: usernameState,
             password: passwordState
         })

@@ -66,7 +66,7 @@ function RegisterSite() {
 
         axios({
             method: "POST",
-            url: "https://gags-backend.herokuapp.com/register",
+            url: "http://localhost:3001/register",
             data: form,
             headers: { "Content-Type": "multipart/form-data" }
         })

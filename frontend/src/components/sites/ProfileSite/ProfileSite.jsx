@@ -26,7 +26,7 @@ function ProfileSite() {
     }
 
     useEffect(() => {
-        axios.get(`https://gags-backend.herokuapp.com/user/${profileName}`)
+        axios.get(`http://localhost:3001/user/${profileName}`)
         .then((res) => {
             setUser(res.data.user)
             setError(false)

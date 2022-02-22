@@ -22,7 +22,7 @@ export default function PostModal() {
         if (!postID) return
         axios({
             method: "GET",
-            url: `https://gags-backend.herokuapp.com/posts/${postID}`,
+            url: `http://localhost:3001/posts/${postID}`,
             headers: {
                 "Authorization": `Bearer ${Cookies.get("accessToken")}`
             }
