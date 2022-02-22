@@ -20,12 +20,17 @@ function Post({ post, saveInLS, updatePost, index }) {
     const optionsRef = useRef()
     const modalRef = useRef()
 
-    const [commentClicked, setCommentClicked] = useState(false)
+    //const [commentClicked, setCommentClicked] = useState(false)
     const [redirectTo, setRedirectTo] = useState("")
+    const [canRedirect, setCanRedirect] = useState(true)
     const [editing, setEditing] = useState(false)
     const [textEntered, setTextEntered] = useState("")
     const [shouldRedirect, setShouldRedirect] = useState(false)
     const { postID, sectionName, profileName } = useParams()
+
+    useEffect(() => {
+        setCanRedirect(postID === undefined)
+    }, [postID])
 
     useEffect(() => {
         setRedirectTo(window.location.pathname === "/" ? `post/${post._id}` : `${window.location.pathname}/post/${post._id}`)
@@ -225,10 +230,6 @@ function Post({ post, saveInLS, updatePost, index }) {
         }
     }
 
-    if (commentClicked) {
-        return <Redirect to={redirectTo} />
-    }
-
     if (editing) {
         return (
             <div className={classes.postWrapper}>
@@ -261,21 +262,35 @@ function Post({ post, saveInLS, updatePost, index }) {
     return (
         <div className={classes.postWrapper}>
             <div className={classes.content}>
-                <Link to={redirectTo}>
+                {canRedirect && 
+                    <Link to={redirectTo}>
+                        <div className={`${classes.center} ${classes.marginLeftRight}`}>
+                            <h2>{post.title}</h2>
+                        </div>
+                    </Link>
+                }
+                {!canRedirect && 
                     <div className={`${classes.center} ${classes.marginLeftRight}`}>
                         <h2>{post.title}</h2>
                     </div>
-                </Link>
+                }
                 <div className={classes.center}>
                     <h6>
                         Posted in <Link className={classes.underlineHover} to={`/section/${post.section}`}>{post.section}</Link> by <a className={classes.underlineHover} target="_blank" href={`/profile/${post.author}`}>{post.author}</a>
                     </h6>
                 </div>
-                <Link className={classes.fullWidth} to={redirectTo}>
+                {canRedirect && 
+                    <Link className={classes.fullWidth} to={redirectTo}>
+                        <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
+                            <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
+                        </div>
+                    </Link>
+                }
+                {!canRedirect &&
                     <div className={`${classes.imageContainer} ${loaded ? "" : classes.minHeight}`}>
                         <img ref={imageRef} onLoad={() => setLoaded(true)} style={{height: imageRef.current && !loaded ? imageRef.current.naturalHeight + "px" : "inherit"}} src={post.imgSrc} className={classes.image} />
                     </div>
-                </Link>
+                }
             </div>
             <div className={classes.statistics}>
                 <div className={action.like ? classes.clicked : ""} onClick={like}>
