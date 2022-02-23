@@ -4,7 +4,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    z-index: 10000;
+    z-index: 1000000;
     width: 90%;
     height: 90%;
     > div {
@@ -55,7 +55,7 @@
     left: 0;
     right: 0;
     background-color: rgba(0, 0, 0, 0.8);
-    z-index: 10000;
+    z-index: 1000000;
     cursor: pointer;
 }
 
