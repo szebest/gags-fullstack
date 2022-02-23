@@ -19,13 +19,10 @@ import AboutSite from './components/sites/AboutSite/AboutSite'
 
 function App() {
     const [accessToken, setAccessToken] = useState()
-    const [ignoreNext, setIgnoreNext] = useState(false)
     const dispatch = useDispatch()
 
     const sendRefreshRequest = () => {
         if (accessToken === undefined || accessToken === 'undefined') return
-
-        setIgnoreNext(true)
 
         axios.post('https://gags-backend.herokuapp.com/refresh', {
             refreshToken: Cookies.get('refreshToken')
@@ -55,26 +52,23 @@ function App() {
 
     useEffect(() => {
         if (accessToken !== 'undefined' && accessToken !== undefined) {
-            if (ignoreNext === false) sendRefreshRequest()
-            else {
-                const str = Cookies.get('expiresIn')
-                if (str !== undefined) {
-                    const number = parseInt(str, 10)
-                    const unit = str.substr(number.toString().length)
-                    const multiplier = unit === 's' ? 1000 :
-                                    unit === 'm' ?  1000 * 60 :
-                                    unit === 'd' ? 1000 * 60 * 24 : 1000
-                    const displacementScale = 0.75
-                    setTimeout(() => {
-                        sendRefreshRequest()
-                    }, number * multiplier * displacementScale)
-                }
+            sendRefreshRequest()
+            const str = Cookies.get('expiresIn')
+            if (str !== undefined) {
+                const number = parseInt(str, 10)
+                const unit = str.substr(number.toString().length)
+                const multiplier = unit === 's' ? 1000 :
+                    unit === 'm' ? 1000 * 60 :
+                        unit === 'd' ? 1000 * 60 * 24 : 1000
+                const displacementScale = 0.75
+                setTimeout(() => {
+                    sendRefreshRequest()
+                }, number * multiplier * displacementScale)
             }
         }
     }, [accessToken])
 
     useEffect(() => {
-        if (accessToken !== undefined && ignoreNext === true) return
         if (accessToken !== undefined) {
             axios.post('https://gags-backend.herokuapp.com/hasAccess', {
                 accessToken: Cookies.get('accessToken')
