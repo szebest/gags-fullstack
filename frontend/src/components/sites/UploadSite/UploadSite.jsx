@@ -8,6 +8,9 @@ import SendButton from '../../SendButton/SendButton'
 import InputField from '../../InputField/InputField'
 import FileInput from '../../FileInput/FileInput'
 
+import useAuthorizedAxios from '../../../hooks/useAuthorizedAxios'
+import useUnauthorizedAxios from '../../../hooks/useUnauthorizedAxios'
+
 function UploadSite() {
     const imageRef = useRef()
     const sectionRef = useRef()
@@ -20,9 +23,12 @@ function UploadSite() {
     const hasAccess = useSelector(state => state.hasAccess)
     const [error, setError] = useState({ title: "", file: "" })
 
+    const authorizedAxios = useAuthorizedAxios()
+    const unauthorizedAxios = useUnauthorizedAxios()
+
     useEffect(() => {
         let cancel
-        axios.get('https://gags-backend.herokuapp.com/sections', {
+        unauthorizedAxios.get('/sections', {
             cancelToken: new axios.CancelToken(c => cancel = c)
         })
         .then(res => {
@@ -62,9 +68,9 @@ function UploadSite() {
             form.append("section", sectionRef.current.value)
             form.append("file", imageRef.current.files[0])
 
-            axios({
+            authorizedAxios({
                 method: "POST",
-                url: "https://gags-backend.herokuapp.com/upload",
+                url: '/upload',
                 data: form,
                 headers: { 
                     "Content-Type": "multipart/form-data",

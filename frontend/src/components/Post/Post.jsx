@@ -1,11 +1,10 @@
 import classes from './styles/Post.module.scss'
 import { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
-import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { Link, Redirect } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import SendButton from '../SendButton/SendButton'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 function Post({ post, saveInLS, updatePost, index }) {
     const [loaded, setLoaded] = useState(false)
@@ -27,6 +26,8 @@ function Post({ post, saveInLS, updatePost, index }) {
     const [textEntered, setTextEntered] = useState("")
     const [shouldRedirect, setShouldRedirect] = useState(false)
     const { postID, sectionName, profileName } = useParams()
+
+    const authorizedAxios = useAuthorizedAxios()
 
     useEffect(() => {
         setCanRedirect(postID === undefined)
@@ -51,12 +52,8 @@ function Post({ post, saveInLS, updatePost, index }) {
 
         if (like === 0 && dislike === 0) return
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${post._id}`, {
+        authorizedAxios.patch(`/posts/${post._id}`, {
             like, dislike
-        }, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
         .then(res => {
             const post = res.data.updatedPost
@@ -162,12 +159,8 @@ function Post({ post, saveInLS, updatePost, index }) {
             return
         }
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${post._id}/edit`, {
+        authorizedAxios.patch(`/posts/${post._id}/edit`, {
             title: textEntered
-        }, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
             .then(res => {
                 const post = res.data.updatedPost
@@ -203,11 +196,7 @@ function Post({ post, saveInLS, updatePost, index }) {
     function deleteThisPost() {
         setOpenOptions(false)
 
-        axios.delete(`https://gags-backend.herokuapp.com/posts/${post._id}`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.delete(`/posts/${post._id}`)
             .then(res => {
                 if (postID !== undefined) {
                     if (saveInLS) localStorage.setItem('postToBeDeleted', res.data.deleted._id)

@@ -7,14 +7,19 @@ import { useSelector } from 'react-redux'
 import { io } from 'socket.io-client'
 import Notifications from '../Notifications/Notifications'
 
+import baseURL from '../../util/baseUrlPage'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
+
 function Navbar() {
     const [user, setUser] = useState({})
     const [showNotifications, setShowNotifications] = useState(false)
     const hasAccess = useSelector(state => state.hasAccess)
-    const socket = useMemo(() => io('https://gags-backend.herokuapp.com'), [])
+    const socket = useMemo(() => io(baseURL), [])
     const [burgerMenuClicked, setBurgerMenuClicked] = useState(false)
     const burgerMenuRef = useRef()
     const notificationsRef = useRef()
+
+    const authorizedAxios = useAuthorizedAxios()
 
     useEffect(() => {
         socket.on('notification', (notification) => {
@@ -29,11 +34,7 @@ function Navbar() {
 
     useEffect(() => {
         if (hasAccess !== undefined && hasAccess) {
-            axios.get(`https://gags-backend.herokuapp.com/user/loggedIn}`, {
-                headers: {
-                    "Authorization": `Bearer ${Cookies.get("accessToken")}`
-                }
-            })
+            authorizedAxios.get(`/user/loggedIn}`)
             .then((res) => {
                 setUser(res.data.user)
                 socket.emit('username', res.data.user.username)
@@ -47,7 +48,7 @@ function Navbar() {
 
     const logout = async () => {
         try {
-            let res = await axios.post('https://gags-backend.herokuapp.com/logout', {
+            let res = await axios.post('http://localhost:3001/logout', {
                 refreshToken: Cookies.get("refreshToken")
             })
             if (res.status === 200) {

@@ -1,16 +1,11 @@
 import classes from './styles/Notification.module.scss'
-import axios from 'axios'
-import Cookies from 'js-cookie'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 function Notification({ data, setRead, index }) {
+    const authorizedAxios = useAuthorizedAxios()
+
     const sendRequest = () => {
-        axios({
-            method: "PATCH",
-            url: `https://gags-backend.herokuapp.com/user/notification/${data._id}?read=true`,
-            headers: { 
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.patch(`/user/notification/${data._id}?read=true`)
         .then(res => {
             setRead(index)
         })

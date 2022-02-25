@@ -45,12 +45,8 @@ app.get('/', (req, res) => {
     return res.send("Welcome to GAGS API")
 })
 
-app.post('/hasAccess', (req, res) => {
-    const accessToken = req.body.accessToken
-
-    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err) => {
-        return res.send({ access: !err })
-    })
+app.post('/hasAccess', authenticateToken, (req, res) => {
+    res.status(200).json({ access: true })
 })
 
 app.post('/login', async (req, res) => {
@@ -135,13 +131,6 @@ app.post('/register', upload.single("file"), async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10)
     const username = req.body.username
 
-    let imageResult = await sharp(req.file.buffer)
-        .resize({ width: 100, height: 100 })
-        .toFormat(req.file.mimetype.split('/')[1])
-        .toBuffer()
-
-    const fileSrc = await uploadFile(req.file.mimetype, req.file.originalname, imageResult.buffer, '1Rw43VHhxDzmpsY-CVfPeUjH1-ee5gyfh')
-
     try {
         const users = await User.find({ username })
         if (users.length > 0) return res.status(409).json({ message: "A user with this login already exists" })
@@ -150,6 +139,13 @@ app.post('/register', upload.single("file"), async (req, res) => {
         console.log(err)
         return res.status(500).json({ message: err.message })
     }
+
+    let imageResult = await sharp(req.file.buffer)
+        .resize({ width: 100, height: 100 })
+        .toFormat(req.file.mimetype.split('/')[1])
+        .toBuffer()
+
+    const fileSrc = await uploadFile(req.file.mimetype, req.file.originalname, imageResult.buffer, '1Rw43VHhxDzmpsY-CVfPeUjH1-ee5gyfh')
 
     const user = new User({
         username: username,

@@ -1,10 +1,11 @@
 import classes from './styles/ProfileSite.module.scss'
 import { useState, useEffect } from 'react'
 import { Redirect } from "react-router-dom"
-import axios from 'axios'
 import PostsContainerAPI from '../../PostsContainer/PostsContainerAPI'
 import CommentsContainerAPI from '../../CommentsContainer/CommentsContainerAPI'
 import { useParams } from 'react-router-dom'
+
+import useUnauthorizedAxios from '../../../hooks/useUnauthorizedAxios'
 
 function ProfileSite() {
     const [user, setUser] = useState(undefined)
@@ -13,6 +14,8 @@ function ProfileSite() {
     const [postsAvailable, setPostsAvailable] = useState(true)
     const [error, setError] = useState(null)
     const { profileName } = useParams()
+
+    const unauthorizedAxios = useUnauthorizedAxios()
 
     const treatAsUTC = (date) => {
         const result = new Date(date)
@@ -27,7 +30,7 @@ function ProfileSite() {
 
     useEffect(() => {
         setUser(undefined)
-        axios.get(`https://gags-backend.herokuapp.com/user/${profileName}`)
+        unauthorizedAxios.get(`/user/${profileName}`)
         .then((res) => {
             setUser(res.data.user)
             setError(false)

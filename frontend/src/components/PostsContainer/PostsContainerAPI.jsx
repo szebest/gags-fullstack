@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useParams } from 'react-router-dom'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const postsPerRequest = 5
@@ -11,6 +12,8 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const [postsAvailable, setPostsAvailable] = useState(true)
     const [posts, setPosts] = useState([])
     const { profileName } = useParams()
+
+    const authorizedAxios = useAuthorizedAxios(false)
 
     function updatePost(updatedPost, index, shouldBeDeleted) {
         setTimeout(() => {
@@ -35,17 +38,12 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const getMainSitePosts = () => {
         if (!postsAvailable) return
 
-        axios({
-            method: "GET",
-            url: "https://gags-backend.herokuapp.com/posts",
+        authorizedAxios.get('/posts', {
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
             }),
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)
@@ -60,17 +58,12 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const getPostsLiked = () => {
         if (!postsAvailable) return
 
-        axios({
-            method: "GET",
-            url: `https://gags-backend.herokuapp.com/user/postsLiked/${profileName}`,
+        authorizedAxios.get(`/user/postsLiked/${profileName}`, {
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            }),
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
+            })
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)
@@ -85,17 +78,12 @@ function PostsContainerAPI({ sectionName, requestType, arePostsAvailable }) {
     const getPostsCreated = () => {
         if (!postsAvailable) return
 
-        axios({
-            method: "GET",
-            url: `https://gags-backend.herokuapp.com/user/postsCreated/${profileName}`,
+        authorizedAxios.get(`/user/postsCreated/${profileName}`, {
             params: new URLSearchParams({
                 postNumber,
                 postsPerRequest,
                 section: sectionName ? sectionName : undefined,
-            }),
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
+            })
         })
         .then(res => {
             setPostsAvailable(res.data.numberOfPostsLeft > 0)

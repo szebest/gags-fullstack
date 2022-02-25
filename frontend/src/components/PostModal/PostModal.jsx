@@ -7,12 +7,15 @@ import { useParams, Link } from 'react-router-dom'
 import { Scrollbars } from 'react-custom-scrollbars'
 import Cookies from 'js-cookie'
 import CommentsContainer from '../CommentsContainer/CommentsContainerAPI'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 export default function PostModal() {
     const { sectionName } = useParams()
     const { postID } = useParams()
 
     const [post, setPost] = useState(null)
+
+    const authorizedAxios = useAuthorizedAxios()
     
     function updatePost(updatedPost, index) {
         setPost({...updatedPost})
@@ -20,13 +23,7 @@ export default function PostModal() {
 
     function getPost() {
         if (!postID) return
-        axios({
-            method: "GET",
-            url: `https://gags-backend.herokuapp.com/posts/${postID}`,
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.get(`/posts/${postID}`)
         .then(res => {
             setPost(res.data.post)
         })

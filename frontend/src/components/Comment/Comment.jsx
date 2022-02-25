@@ -1,10 +1,10 @@
 import classes from './styles/Comment.module.scss'
 import React, { useState, useEffect, useRef } from 'react'
 import NewComment from '../NewComment/NewComment'
-import axios from 'axios'
-import Cookies from 'js-cookie'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 export default function Comment({ postID, comment, sendComment, updateThisComment, index, avatar }) {
     const [openReply, setOpenReply] = useState(false)
@@ -22,6 +22,8 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
 
     const hasAccess = useSelector(state => state.hasAccess)
 
+    const authorizedAxios = useAuthorizedAxios()
+
     useEffect(() => {
         if (!comment._id) return
 
@@ -32,12 +34,8 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
 
         if (like === 0 && dislike === 0) return
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}/like`, {
+        authorizedAxios.patch(`/posts/${postID}/comment/${comment._id}/like`, {
             like, dislike
-        }, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
             .then(res => {
                 updateThisComment(res.data.updatedComment, index)
@@ -110,12 +108,8 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
             return
         }
 
-        axios.patch(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}/edit`, {
+        authorizedAxios.patch(`/posts/${postID}/comment/${comment._id}/edit`, {
             comment: textEntered
-        }, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
             .then(res => {
                 updateThisComment(res.data.updatedComment, index)
@@ -130,11 +124,7 @@ export default function Comment({ postID, comment, sendComment, updateThisCommen
     function deleteThisComment() {
         setOpenOptions(false)
 
-        axios.delete(`https://gags-backend.herokuapp.com/posts/${postID}/comment/${comment._id}`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.delete(`/posts/${postID}/comment/${comment._id}`)
             .then(res => {
                 updateThisComment(null, index, true)
             })

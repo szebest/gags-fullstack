@@ -7,6 +7,8 @@ import SendButton from '../../SendButton/SendButton'
 import InputField from '../../InputField/InputField'
 import FileInput from '../../FileInput/FileInput'
 
+import useUnauthorizedAxios from '../../../hooks/useUnauthorizedAxios'
+
 function RegisterSite() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
@@ -20,6 +22,8 @@ function RegisterSite() {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [submitted, setSubmitted] = useState(false)
+    
+    const unauthorizedAxios = useUnauthorizedAxios()
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
@@ -64,9 +68,9 @@ function RegisterSite() {
 
         setSubmitted(true)
 
-        axios({
+        unauthorizedAxios({
             method: "POST",
-            url: "https://gags-backend.herokuapp.com/register",
+            url: "/register",
             data: form,
             headers: { "Content-Type": "multipart/form-data" }
         })

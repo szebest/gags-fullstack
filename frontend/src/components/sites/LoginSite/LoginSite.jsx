@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux'
 import SendButton from '../../SendButton/SendButton'
 import InputField from '../../InputField/InputField'
 
+import useUnauthorizedAxios from '../../../hooks/useUnauthorizedAxios'
+
 function LoginSite() {
     const queryParam = new URLSearchParams(document.location.search).get("username")
     const [usernameState, setUsernameState] = useState(queryParam ? queryParam : "")
@@ -15,6 +17,8 @@ function LoginSite() {
     const [, setLoading] = useState(false)
     const hasAccess = useSelector(state => state.hasAccess)
     const [showPassword, setShowPassword] = useState(false)
+
+    const unauthorizedAxios = useUnauthorizedAxios()
 
     if (hasAccess !== null && hasAccess)
         return <Redirect to="/" />
@@ -25,7 +29,7 @@ function LoginSite() {
         setError("")
         setLoading(true)
 
-        axios.post('https://gags-backend.herokuapp.com/login', {
+        unauthorizedAxios.post('/login', {
             username: usernameState,
             password: passwordState
         })

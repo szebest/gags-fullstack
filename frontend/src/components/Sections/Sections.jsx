@@ -3,12 +3,15 @@ import Section from '../Section/Section'
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Scrollbars } from 'react-custom-scrollbars';
+import useUnauthorizedAxios from '../../hooks/useUnauthorizedAxios'
 
 function Sections() {
     const [sections, setSections] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [hideButton, setHideButton] = useState(false)
     const scrollValueRef = useRef(0)
+
+    const unauthorizedAxios = useUnauthorizedAxios()
 
     const handleScroll = () => {
         const previousScrollY = scrollValueRef.current
@@ -26,7 +29,7 @@ function Sections() {
     useEffect(() => {
         scrollValueRef.current = window.scrollY
         let cancel
-        axios.get('https://gags-backend.herokuapp.com/sections', {
+        unauthorizedAxios.get('/sections', {
             cancelToken: new axios.CancelToken(c => cancel = c)
         })
         .then(res => {

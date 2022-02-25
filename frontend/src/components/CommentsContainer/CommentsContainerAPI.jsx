@@ -1,22 +1,19 @@
 import classes from './styles/CommentsContainer.module.scss'
 import React, {useState, useEffect} from 'react'
-import Cookies from 'js-cookie'
 import CommentsContainer from './CommentsContainer'
-import axios from 'axios'
 import { useParams } from 'react-router-dom'
+import useAuthorizedAxios from '../../hooks/useAuthorizedAxios'
 
 export default function CommentsContainerAPI({ sectionName, postID, requestType, arePostsAvailable, showNewComment }) {
     const [comments, setComments] = useState([])
     const { profileName } = useParams()
 
+    const authorizedAxios = useAuthorizedAxios(false)
+
     let sendRequest
 
     function postComments() {
-        axios.get(`https://gags-backend.herokuapp.com/posts/${postID}/comment`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.get(`/posts/${postID}/comment`)
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -26,11 +23,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsCreated() {
-        axios.get(`https://gags-backend.herokuapp.com/user/commentsCreated/${profileName}`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.get(`/user/commentsCreated/${profileName}`)
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -40,11 +33,7 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function commentsLiked() {
-        axios.get(`https://gags-backend.herokuapp.com/user/commentsLiked/${profileName}`, {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
-        })
+        authorizedAxios.get(`/user/commentsLiked/${profileName}`)
         .then(res => {
             setComments([...res.data.comments])
         })
@@ -73,13 +62,8 @@ export default function CommentsContainerAPI({ sectionName, postID, requestType,
     }
 
     function sendComment(comment, parentComment) {
-        axios.post(`https://gags-backend.herokuapp.com/posts/${postID}/comment`, {
+        authorizedAxios.post(`/posts/${postID}/comment`, {
             comment
-        }, 
-        {
-            headers: {
-                "Authorization": `Bearer ${Cookies.get("accessToken")}`
-            }
         })
         .then(res => {
             const tmpComments = [res.data.comment, ...comments]
