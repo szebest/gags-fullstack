@@ -6,12 +6,15 @@ import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
 import axios from 'axios'
 import SendButton from '../SendButton/SendButton'
+import useUnauthorizedAxios from '../../hooks/useUnauthorizedAxios'
 
 export default function CommentsContainer({comments, callForMore, sectionName, ready, updateComment, sendComment, refreshComments, postID, showNewComment}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
     const [avatars, setAvatars] = useState(new Map())
     const [previousComments, setPreviousComments] = useState([])
+
+    const unauthorizedAxios = useUnauthorizedAxios()
 
     useEffect(() => {
         let difference = comments.filter(x => !previousComments.includes(x))
@@ -34,9 +37,9 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
             if (value !== null) return
 
             promiseArray.push(new Promise((resolve, reject) => {
-                axios({
+                unauthorizedAxios({
                     method: "GET",
-                    url: `http://localhost:3001/user/avatar/${key}`,
+                    url: `/user/avatar/${key}`,
                 })
                     .then(res => {
                         avatarsCopy.set(key, res.data.imgSrc)
