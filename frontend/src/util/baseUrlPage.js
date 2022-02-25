@@ -1,2 +1,2 @@
-const baseURL = 'http://localhost:3001'
+const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://gags-backend.herokuapp.com"
 export default baseURL

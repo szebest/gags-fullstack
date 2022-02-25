@@ -54,7 +54,7 @@
     width: var(--size);
     height: var(--size);
     transform: translateX(50%);
-    z-index: 1000;
+    z-index: 10000;
     visibility: hidden;
 
     &:hover {
@@ -110,7 +110,7 @@
         height: 100vh;
         background-color: white;
         opacity: 0;
-        z-index: 10000;
+        z-index: 10001;
         transition: left 300ms linear, opacity 300ms linear;
     }
 
@@ -128,7 +128,7 @@
 .visible {
     left: 0px;
     opacity: 1;
-    z-index: 1001;
+    z-index: 10001;
 }
 
 @media (max-width: 800px) {

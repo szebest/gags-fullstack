@@ -105,6 +105,9 @@
     }
 
     .listItems {
+        * {
+            display: none;
+        }
         width: 0px;
         height: 0px;
         opacity: 0;
@@ -129,6 +132,10 @@
         transition: opacity 300ms linear;
         gap: 10px;
         z-index: 1001;
+
+        * {
+            display: inherit;
+        }
         
         li {
             width: 100%;
