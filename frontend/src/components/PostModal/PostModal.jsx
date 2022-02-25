@@ -15,7 +15,7 @@ export default function PostModal() {
 
     const [post, setPost] = useState(null)
 
-    const authorizedAxios = useAuthorizedAxios()
+    const authorizedAxios = useAuthorizedAxios(false)
     
     function updatePost(updatedPost, index) {
         setPost({...updatedPost})
