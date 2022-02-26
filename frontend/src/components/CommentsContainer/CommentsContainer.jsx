@@ -4,15 +4,16 @@ import Comment from '../Comment/Comment'
 import NewComment from '../NewComment/NewComment'
 import 'intersection-observer'
 import { useIsVisible } from 'react-is-visible'
-import axios from 'axios'
 import SendButton from '../SendButton/SendButton'
 import useUnauthorizedAxios from '../../hooks/useUnauthorizedAxios'
+import { useSelector } from 'react-redux'
 
 export default function CommentsContainer({comments, callForMore, sectionName, ready, updateComment, sendComment, refreshComments, postID, showNewComment}) {
     const observeRef = useRef()
     const isVisible = useIsVisible(observeRef)
     const [avatars, setAvatars] = useState(new Map())
     const [previousComments, setPreviousComments] = useState([])
+    const hasAccess = useSelector(state => state.hasAccess)
 
     const unauthorizedAxios = useUnauthorizedAxios()
 
@@ -60,12 +61,17 @@ export default function CommentsContainer({comments, callForMore, sectionName, r
 
     return (
         <>
-            {showNewComment &&
-            <NewComment sendComment={sendComment} parentComment={null}>
-                <SendButton>
-                    <input type="submit" value="Refresh comment section" onClick={refreshComments} />
-                </SendButton>
-            </NewComment>
+            {showNewComment && hasAccess &&
+                <NewComment sendComment={sendComment} parentComment={null}>
+                    <SendButton>
+                        <input type="submit" value="Refresh comment section" onClick={refreshComments} />
+                    </SendButton>
+                </NewComment>
+            }
+            {(!showNewComment || !hasAccess) &&
+                <div className={classes.centerHeader}>
+                    <h2>Please login to post a comment</h2>
+                </div>
             }
             <div className={classes.container}>
                 <div className={classes.commentWrapper}>

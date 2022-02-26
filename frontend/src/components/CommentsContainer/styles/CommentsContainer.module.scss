@@ -27,6 +27,17 @@
     }
 }
 
+.centerHeader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+        width: max-content;
+        margin-top: 0px;
+    }
+}
+
 .observer {
     position: absolute;
     bottom: 200px;
