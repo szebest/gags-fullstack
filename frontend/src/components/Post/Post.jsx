@@ -38,6 +38,16 @@ function Post({ post, saveInLS, updatePost, index }) {
     }, [window.location.pathname])
 
     useEffect(() => {
+        if (hasAccess === null || hasAccess === true) return
+
+        post.isAuthor = false
+        setAction({
+            like: 0,
+            dislike: 0
+        })
+    }, [hasAccess])
+
+    useEffect(() => {
         if (!post._id) return
 
         if (localStorage.getItem('doNotSendLike') !== null) {
